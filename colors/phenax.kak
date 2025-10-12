@@ -23,9 +23,9 @@ evaluate-commands %sh{
 
   ## code
   echo "
-    face global value ${orange}
+    face global value ${lightblue}
     face global type ${yellow}
-    face global variable ${red}
+    face global variable ${lightblue}
     face global module ${lightblue}
     face global function ${lightblue}
     face global string ${green}

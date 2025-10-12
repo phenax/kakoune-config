@@ -31,6 +31,14 @@ add-highlighter global/ show-matching -previous
 # add-highlighter global/search dynregex '%reg{/}' 0:search
 hook global RegisterModified '/' %{ add-highlighter -override global/search regex "%reg{/}" 0:search }
 map global user '<esc>' ':set-register slash ""<ret>'
+map global user '/' '/(?i)'
+
+# TODO: Reset count on modechange?
+declare-option -hidden int user_mode_count 0
+define-command enter-user-mode-with-count -params 1 %{
+  set-option window user_mode_count %val{count}
+  enter-user-mode %arg{1}
+}
 
 # Mode cursors
 set-face global InsertCursor default,red+B
