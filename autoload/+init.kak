@@ -28,11 +28,13 @@ add-highlighter global/ line '%val{cursor_line}' RowLine
 add-highlighter global/ regex \h+$ 0:Error # Highlight trailing whitespaces
 add-highlighter global/ wrap -word -indent # Softwrap long lines
 add-highlighter global/ show-matching -previous
-# add-highlighter global/search dynregex '%reg{/}' 0:search
+
+# Search
 hook global RegisterModified '/' %{ add-highlighter -override global/search regex "%reg{/}" 0:search }
 map global user '<esc>' ':set-register slash ""<ret>'
 map global user '/' '/(?i)'
 
+# Preserve count for user modes (look for alternatives)
 # TODO: Reset count on modechange?
 declare-option -hidden int user_mode_count 0
 define-command enter-user-mode-with-count -params 1 %{
@@ -50,44 +52,6 @@ hook global ModeChange .*:insert:.* %{ try %{
   unset-face window PrimaryCursor
   unset-face window PrimaryCursorEol
 } }
-
-# File/buffer management
-def find -docstring "find files" -menu -params 1 %{ edit -existing %arg{1} } \
-         -shell-script-candidates %{ fd -t f --hidden --color=never -E .git }
-set-option global grepcmd "rg -S --vimgrep --hidden -g '!**/.git/**'"
-
-def file-manager -params .. %{ connect terminal env "EDITOR=kcr edit" daffm -c @kak %arg{@} }
-
-declare-user-mode buffer
-map global user b ':enter-user-mode buffer<ret>' -docstring 'Buffer mode'
-map global buffer b ':buffer ' -docstring 'Switch buffer'
-map global buffer d ':delete-buffer<ret>' -docstring 'Delete buffer'
-map global buffer s ':write<ret>' -docstring 'Save'
-
-declare-user-mode file
-map global user f ':enter-user-mode file<ret>' -docstring 'File mode'
-map global file f ':find ' -docstring 'Find files'
-map global file g ':grep ' -docstring 'Grep'
-map global file n ':file-manager %val{buffile}<ret>' -docstring 'File manager'
-
-# TODO: Proper mappings for next/prev on results
-hook global -always BufOpenFifo '\*grep\*' %{ map global normal <minus> ': grep-next-match<ret>' }
-hook global -always BufOpenFifo '\*make\*' %{ map global normal <minus> ': make-next-error<ret>' }
-
-# Git
-def gitui -params .. %{ connect terminal env "EDITOR=kcr edit" gitu %arg{@} }
-
-declare-user-mode git
-map global user g ':enter-user-mode git<ret>' -docstring 'Git mode'
-map global git n ':git next-hunk<ret>' -docstring 'Next hunk'
-map global git p ':git prev-hunk<ret>' -docstring 'Previous hunk'
-map global git s ':gitui<ret>' -docstring 'Git status UI'
-set-option global git_diff_add_char "+"
-set-option global git_diff_del_char "-"
-set-option global git_diff_mod_char "~"
-set-option global git_diff_top_char "^"
-# hook global -group git-diff ModeChange .*:.*:normal %{ try %{git show-diff} }
-# hook global -group git-diff WinCreate .* %{ try %{git show-diff} }
 
 # Tmux window mode
 declare-user-mode win
@@ -111,7 +75,7 @@ def casecamel %{ exec '`s[-_<space>]<ret>d~<a-i>w' }
 def casesnake %{ exec '<a-:><a-;>s-|[a-z][A-Z]<ret>;a<space><esc>s[-\s]+<ret>c_<esc><a-i>w`' }
 def casekebab %{ exec '<a-:><a-;>s_|[a-z][A-Z]<ret>;a<space><esc>s[_\s]+<ret>c-<esc><a-i>w`' }
 map global code <a-k> :casekebab<ret> -docstring 'kebab-casing'
-map global code <a-s> :casesnake<ret> -docstring 'snake_casing'
+map global code <a-_> :casesnake<ret> -docstring 'snake_casing'
 map global code <a-c> :casecamel<ret> -docstring 'camelCasing'
 
 map global normal <c-j> 15j

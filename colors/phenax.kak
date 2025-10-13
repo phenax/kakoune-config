@@ -1,6 +1,6 @@
 evaluate-commands %sh{
   foreground="rgb:c5c8c6"
-  foreground2="rgb:809090"
+  foreground2="rgb:90a0a0"
   background="default"
   accent1="rgb:007070"
   accent2="rgb:009090"
@@ -72,7 +72,7 @@ evaluate-commands %sh{
     face global LineNumbers ${linenr_fg},${linenr_bg}
     face global LineNumberCursor ${linenr_fg_cur},${linenr_bg}+b
     face global LineNumbersWrapped ${mildhighlight},${linenr_bg}+b
-    face global MenuForeground ${menu},${foreground}
+    face global MenuForeground ${background},${accent1}
     face global MenuBackground ${foreground},${menu}
     face global MenuInfo ${red}
     face global Information ${foreground2},${background}
