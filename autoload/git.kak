@@ -2,7 +2,7 @@ define-command gitui -params .. %{ connect terminal env "EDITOR=kcr edit" gitu %
 
 declare-user-mode git
 map global user g ':enter-user-mode git<ret>' -docstring 'Git mode'
-map global git s ':gitu<ret>' -docstring 'Gitu tui'
+map global git s ':gitui<ret>' -docstring 'Git tui'
 map global git A ':git add %val{buffile}<ret>' -docstring 'Add file'
 map global git c ':git add commit<ret>' -docstring 'Commit'
 map global git C ':git add commit --amend<ret>' -docstring 'Amend commit'

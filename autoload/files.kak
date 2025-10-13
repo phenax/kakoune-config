@@ -1,5 +1,3 @@
-set-option global grepcmd "rg -S --vimgrep --hidden -g '!**/.git/**'"
-
 def find -docstring "find files" -menu -params 1 %{ edit -existing %arg{1} } \
          -shell-script-candidates %{ fd -t f --hidden --color=never -E .git }
 
@@ -14,9 +12,4 @@ map global buffer s ':write<ret>' -docstring 'Save'
 declare-user-mode file
 map global user f ':enter-user-mode file<ret>' -docstring 'File mode'
 map global file f ':find ' -docstring 'Find files'
-map global file g ':grep ' -docstring 'Grep'
 map global file n ':file-manager %val{buffile}<ret>' -docstring 'File manager'
-
-# TODO: Proper mappings for next/prev on results
-hook global -always BufOpenFifo '\*grep\*' %{ map global normal <minus> ': grep-next-match<ret>' }
-hook global -always BufOpenFifo '\*make\*' %{ map global normal <minus> ': make-next-error<ret>' }
