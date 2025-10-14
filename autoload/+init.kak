@@ -1,11 +1,11 @@
 # Link builtin autoloads
 nop %sh{ ln -s "$kak_runtime/rc" "$kak_config/autoload/standard-library" 2>/dev/null || true }
-# evaluate-commands %sh{kak-tree-sitter -dksvv --init "${kak_session}"}
 evaluate-commands %sh{kcr init kakoune}
 
 hook global KakBegin .* %{
   require-module luar
   set-option global luar_interpreter luajit
+  # evaluate-commands %sh{kak-tree-sitter -dksvv --init "${kak_session}" --with-highlighting --with-text-objects}
 }
 
 colorscheme phenax
@@ -16,10 +16,7 @@ set-option global tabstop 2
 set-option global path -add "**"
 set-option global startup_info_version 20250603
 set-option global scrolloff 10,3
-set-option global makecmd 'make -j8' # Override for others
-set-option -add global ui_options \
-                       terminal_enable_mouse=false
-                       # terminal_assistant=none \
+set-option -add global ui_options terminal_enable_mouse=false terminal_set_title=true
 set-option global modelinefmt \
   '{StatusLineDetails}{{context_info}} {{mode_info}}
 %val{cursor_line}/%val{buf_line_count}:%val{cursor_char_column}
@@ -33,12 +30,19 @@ add-highlighter global/ line '%val{cursor_line}' RowLine
 add-highlighter global/ regex \h+$ 0:Error # Highlight trailing whitespaces
 add-highlighter global/ wrap -word -indent # Softwrap long lines
 add-highlighter global/ show-matching -previous
+add-highlighter global/ show-whitespaces -spc ' ' -tab '│' -tabpad 'y' -lf '¬' -indent '│'
 
 # Search
 hook global RegisterModified '/' %{ add-highlighter -override global/search regex "%reg{/}" 0:search }
 map global user '<esc>' ': set-register slash ""<ret>'
 map global user '/' '/(?i)'
 map global user 'r' '*%s<ret>'
+
+declare-user-mode system
+map global user q ': enter-user-mode system<ret>' -docstring 'System mode'
+map global system o ': echo %opt{}<left>'
+map global system v ': echo %val{}<left>'
+map global system d ': buffer *debug*<ret>'
 
 # Preserve count for user modes (look for alternatives)
 # TODO: Reset count on modechange?
@@ -49,7 +53,6 @@ define-command enter-user-mode-with-count -params 1 %{
 }
 
 # Mode cursors
-set-face global InsertCursor default,red+B
 hook global ModeChange .*:.*:insert %{
   set-face window PrimaryCursor InsertCursor
   set-face window PrimaryCursorEol InsertCursor
@@ -79,6 +82,7 @@ map global user p "<a-!> xclip -selection clipboard -o<ret>" -docstring "paste t
 declare-user-mode code
 map global user c ':enter-user-mode code<ret>' -docstring 'Code mode'
 map global code c :comment-line<ret> -docstring 'Comment/uncomment lines'
+map global code f :format<ret> -docstring 'Format buffer'
 def casecamel %{ exec '`s[-_<space>]<ret>d~<a-i>w' }
 def casesnake %{ exec '<a-:><a-;>s-|[a-z][A-Z]<ret>;a<space><esc>s[-\s]+<ret>c_<esc><a-i>w`' }
 def casekebab %{ exec '<a-:><a-;>s_|[a-z][A-Z]<ret>;a<space><esc>s[_\s]+<ret>c-<esc><a-i>w`' }
@@ -93,4 +97,29 @@ map global normal <c-k> 15k
 # Editorconfig
 hook global BufOpenFile .* %{ try %{editorconfig-load} }
 hook global BufNewFile .* %{ try %{editorconfig-load} }
+
+declare-user-mode surround
+declare-user-mode surround-append
+declare-user-mode surround-delete
+map global user s ': enter-user-mode surround<ret>'
+map global surround a ': enter-user-mode surround-append<ret>'
+map global surround d ': enter-user-mode surround-delete<ret>'
+
+define-command define-surround -params 3 %{
+  evaluate-commands %sh{
+    echo "map global surround-append %{${1}} %{i${2}<esc>a${3}}"
+    echo "map global surround-delete %{${1}} %{<a-a>${2}<a-S>d,}"
+  }
+}
+
+# hook global KakBegin .* %{
+#   define-surround ( ( )
+#   define-surround [ [ ]
+#   # define-surround < < >
+#   # define-surround '{' '{' '}'
+#   # define-surround '<' '<' '>'
+#   # define-surround '`' '`' '`'
+#   define-surround '"' '"' '"'
+#   # define-surround "'" "'" "'"
+# }
 
