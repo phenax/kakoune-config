@@ -20,12 +20,16 @@ define-command marks-add -params 1..2 %{
     [ -f "$path" ] || touch "$path"
     newfile="$1"
     pos="$2"
-    if [ -z "$pos" ] || [ "$pos" = "0" ]; then pos="99"; else pos=$(($pos-1)); fi
+    if [ -z "$pos" ] || [ "$pos" = "0" ]; then
+      pos="99";
+    else
+      pos="$(echo "$pos" | awk '{printf "%.1f", $1 <= 1 ? 0 : $1 - 0.5}')";
+    fi
     function append() { cat; echo -e "$pos\t$newfile"; }
     newfiles=$(grep -v "$newfile" "$path" \
                 | nl | sed 's/^\s*//' \
-                | append | sort -k 2 | uniq -f1 | sort \
-                | sed 's/^\s*[-0-9]\+\s\+//')
+                | append | LC_ALL=C sort -g -b -k 2 | uniq -f1 | LC_ALL=C sort -g -b \
+                | sed 's/^\s*[-.0-9]\+\s\+//')
     echo -e "$newfiles" > "$path.tmp"
     mv "$path.tmp" "$path" || true
     rm -f "$path.tmp" || true
@@ -42,11 +46,20 @@ define-command marks-delete -params 1 %{
   marks-show
 }
 
+define-command marks-clear %{
+  nop %sh{
+    path="$kak_opt_marks_path/$kak_opt_marks_name"
+    [ -f "$path" ] && rm -f "$path" || true
+  }
+}
+
 define-command marks-show %{
   info -title 'marks' -markup %sh{
     path="$kak_opt_marks_path/$kak_opt_marks_name"
-    [ -f "$path" ] || exit 0
     echo -n "{Default}"
+    if ! [ -f "$path" ] || [ "$(wc -l "$path")" = "0" ]; then
+      echo "{comment}<empty>" && exit 0;
+    fi
     cat "$path" | while IFS= read file; do
       short_path=$(echo "$file" | awk -F/ '{if (NF >= 2) {print $(NF-1) "/" $NF} else {print $NF}}')
       hl=$([ "$file" = "$kak_buffile" ] && echo "{keyword}" || echo "{Default}")
@@ -72,3 +85,4 @@ map global user a ':enter-user-mode-with-count marks<ret>' -docstring 'Marks mod
 map global user <space> ':marks-switch %val{count}<ret>' -docstring 'Switch marks'
 map global marks a ':marks-add %val{buffile} %opt{user_mode_count}<ret>' -docstring 'Create new mark from buffer'
 map global marks d ':marks-delete %val{buffile}<ret>' -docstring 'Delete mark'
+map global marks C ':marks-clear<ret>' -docstring 'Clear mark'
