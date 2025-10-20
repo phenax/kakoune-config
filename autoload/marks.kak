@@ -2,7 +2,10 @@ declare-option str marks_path
 declare-option str marks_name
 
 hook global KakBegin .* %{
-  set-option global marks_path %sh{ echo "$XDG_DATA_HOME/kak/marks" }
+  set-option global marks_path %sh{
+    datadir="${XDG_DATA_HOME:-"$HOME/.local/share"}"
+    echo "$datadir/kak/marks"
+  }
 }
 
 hook global EnterDirectory .* %{ evaluate-commands %sh{
@@ -26,7 +29,7 @@ define-command marks-add -params 1..2 %{
       pos="$(echo "$pos" | awk '{printf "%.1f", $1 <= 1 ? 0 : $1 - 0.5}')";
     fi
     function append() { cat; echo -e "$pos\t$newfile"; }
-    newfiles=$(grep -v "$newfile" "$path" \
+    newfiles=$(grep -v -F "$newfile" "$path" \
                 | nl | sed 's/^\s*//' \
                 | append | LC_ALL=C sort -g -b -k 2 | uniq -f1 | LC_ALL=C sort -g -b \
                 | sed 's/^\s*[-.0-9]\+\s\+//')

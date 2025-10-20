@@ -34,9 +34,9 @@ hook global BufSetOption filetype=(?:javascript|typescript) %{
     args = ["--stdio"]
     [tailwindcss-language-server.settings.tailwindCSS]
     editor = {}
-    [biome]
-    root_globs = ["biome.json", "package.json", "tsconfig.json", "jsconfig.json"]
-    args = ["lsp-proxy"]
+    # [biome]
+    # root_globs = ["biome.json", "package.json", "tsconfig.json", "jsconfig.json"]
+    # args = ["lsp-proxy"]
   }
 }
 

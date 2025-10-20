@@ -1,11 +1,11 @@
 # Link builtin autoloads
 nop %sh{ ln -s "$kak_runtime/rc" "$kak_config/autoload/standard-library" 2>/dev/null || true }
 evaluate-commands %sh{kcr init kakoune}
+evaluate-commands %sh{kak-tree-sitter -dksvv --init "${kak_session}" --with-highlighting --with-text-objects}
 
 hook global KakBegin .* %{
   require-module luar
   set-option global luar_interpreter luajit
-  # evaluate-commands %sh{kak-tree-sitter -dksvv --init "${kak_session}" --with-highlighting --with-text-objects}
 }
 
 colorscheme phenax
