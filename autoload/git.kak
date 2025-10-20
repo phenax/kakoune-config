@@ -3,11 +3,15 @@ define-command gitui -params .. %{
 }
 
 declare-user-mode git
+declare-user-mode git-r
 map global user g ': enter-user-mode git<ret>' -docstring 'Git mode'
 map global git s ': gitui<ret>' -docstring 'Git tui'
 map global git A ': git add %val{buffile}<ret>' -docstring 'Add file'
 map global git c ': git add commit<ret>' -docstring 'Commit'
 map global git C ': git add commit --amend<ret>' -docstring 'Amend commit'
+
+map global git r ': enter-user-mode git-r<ret>' -docstring 'Git re(base/set) mode'
+map global git-r f ': git reset HEAD^1 -- %val{buffile}<ret>' -docstring 'Split file out of last commit'
 
 # Hunk
 map global git n ': git next-hunk<ret>' -docstring 'Next hunk'
@@ -20,56 +24,22 @@ set-option global git_diff_mod_char "~"
 set-option global git_diff_top_char "^"
 
 define-command git-toggle-diff %{
-  try %{ remove-highlighter window/git-diff } catch %{ git show-diff }
+  try %{ remove-highlighter window/git-diff } catch %{ git show-diff } catch %{ }
 }
 
 # TODO: Toggle this
-hook global -group git-diff-if-repo EnterDirectory .* %{
-  remove-hooks global git-diff
-  evaluate-commands %sh{
-    if (git rev-parse --is-inside-work-tree >/dev/null 2>&1); then
-      echo "
-        hook global -group git-diff ModeChange .*:.*:normal %{ try %{git update-diff} }
-        hook global -group git-diff WinCreate .* %{ try %{git update-diff} }
-        hook global -group git-diff BufReload .* %{ try %{git update-diff} }
-      "
-    fi
-  }
-}
-
-# Git window actions
-
-# declare-option -hidden str git_file
-# define-command -hidden git-eval-status-line %{
-#   evaluate-commands %sh{
-#     file=$(echo "$kak_selection" | sed 's/^\s*[A-Z?]\+\s\+//')
-#     echo "set-option window git_file '$file'"
+# hook global -group git-diff-if-repo EnterDirectory .* %{
+#   remove-hooks global git-diff
+#   try %{
+#     evaluate-commands %sh{
+#       if (git rev-parse --is-inside-work-tree >/dev/null 2>&1); then
+#         echo "
+#           hook global -group git-diff ModeChange .*:.*:normal %{ try %{git update-diff} }
+#           hook global -group git-diff WinCreate .* %{ try %{git update-diff} }
+#           hook global -group git-diff BufReload .* %{ try %{git update-diff} }
+#         "
+#       fi
+#     }
 #   }
 # }
 
-# declare-user-mode git-status-commit
-# declare-user-mode git-status-log
-# map global git s ':git status -bs<ret>' -docstring 'Git status UI'
-# hook -group git-status global WinSetOption filetype=git-status %{
-#   set-option buffer readonly true
-#   map window normal R ':git status -bs<ret>'
-#   map window normal q ': delete-buffer %val{buffile}<ret>'
-
-#   map window user l ': enter-user-mode git-status-log<ret>'
-#   map window git-status-log l ': git log --oneline<ret>'
-#   map window normal d 'x: git-eval-status-line<ret>: git diff -- %opt{git_file}'
-
-#   map window normal c ': enter-user-mode git-status-commit<ret>'
-#   map window git-status-commit c ': git commit<ret>'
-#   map window git-status-commit a ': git commit --amend<ret>'
-# }
-
-# hook -group git-log global WinSetOption filetype=git-log %{
-#   set-option buffer readonly true
-#   map window normal q ': git status -bs<ret>'
-# }
-
-# hook -group git-diff global WinSetOption filetype=git-diff %{
-#   set-option buffer readonly true
-#   map window normal q ': git status -bs<ret>'
-# }
