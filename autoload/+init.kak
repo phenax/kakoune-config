@@ -40,9 +40,10 @@ map global user 'r' '*%s<ret>'
 
 declare-user-mode system
 map global user q ': enter-user-mode system<ret>' -docstring 'System mode'
-map global system o ': echo %opt{}<left>'
-map global system v ': echo %val{}<left>'
-map global system d ': buffer *debug*<ret>'
+map global system o ':echo %opt{}<left>'
+map global system v ':echo %val{}<left>'
+map global system d ':buffer *debug*<ret>'
+map global system f ':fennel %{()}<left><left>'
 
 # Preserve count for user modes (look for alternatives)
 # TODO: Reset count on modechange?
@@ -122,4 +123,9 @@ define-command define-surround -params 3 %{
 #   define-surround '"' '"' '"'
 #   # define-surround "'" "'" "'"
 # }
+
+
+hook global BufCreate .*[.]mdx %{
+  set-option buffer filetype markdown
+}
 

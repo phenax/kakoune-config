@@ -37,3 +37,5 @@
   (each [line (file:lines)] (table.insert lines line))
   (file:close)
   lines)
+
+(M.main)

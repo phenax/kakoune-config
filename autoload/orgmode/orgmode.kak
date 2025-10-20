@@ -20,22 +20,21 @@ define-command orgmode-toggle %{
 
 define-command orgmode-jump-link %{
   # TODO: support multiple links in single line
-  evaluate-commands -draft %{ try %{
+  evaluate-commands %{ try %{
     execute-keys ',xs\[\[([^\n\]]+)\]<ret>'
-    set-register a %reg{1}
+    evaluate-commands %sh{
+      [ -z "$kak_reg_1" ] && exit 0
+      case "$kak_reg_1" in
+        https://*|http://*) xdg-open "$kak_reg_1" >/dev/null 2>&1 ;;
+        /*|~/*) echo "edit %{$kak_reg_1}" ;;
+        *)
+          current_path="${kak_buffile:-"$kak_bufname"}"
+          path="$(realpath -s "$(dirname "$kak_buffile")/$kak_reg_1")"
+          echo "edit %{$path}"
+        ;;
+      esac
+    }
   } }
-  evaluate-commands %sh{
-    [ -z "$kak_reg_a" ] && exit 0
-    case "$kak_reg_a" in
-      https://*|http://*) xdg-open "$kak_reg_a" >/dev/null 2>&1 ;;
-      /*|~/*) echo "edit %{$kak_reg_a}" ;;
-      *)
-        current_path="${kak_buffile:-"$kak_bufname"}"
-        path="$(realpath -s "$(dirname "$kak_buffile")/$kak_reg_a")"
-        echo "edit %{$path}"
-      ;;
-    esac
-  }
 }
 
 define-command orgmode-toggle-checkbox %{

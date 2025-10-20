@@ -12,6 +12,7 @@ map global git C ': git add commit --amend<ret>' -docstring 'Amend commit'
 
 map global git r ': enter-user-mode git-r<ret>' -docstring 'Git re(base/set) mode'
 map global git-r f ': git reset HEAD^1 -- %val{buffile}<ret>' -docstring 'Split file out of last commit'
+map global git m ': git-line-blame<ret>' -docstring 'Blame selection lines'
 
 # Hunk
 map global git n ': git next-hunk<ret>' -docstring 'Next hunk'
@@ -25,6 +26,14 @@ set-option global git_diff_top_char "^"
 
 define-command git-toggle-diff %{
   try %{ remove-highlighter window/git-diff } catch %{ git show-diff } catch %{ }
+}
+
+define-command git-line-blame %{
+  evaluate-commands %sh{
+    file="${kak_buffile}"
+    line="$(echo "$kak_selection_desc" | sed -E 's/\.[0-9]+//g')"
+    echo "terminal sh -c \"git --no-pager log -u -L '$line:$file' --color=always | delta\""
+  }
 }
 
 # TODO: Toggle this
