@@ -9,10 +9,10 @@ map global git s ': gitui<ret>' -docstring 'Git tui'
 map global git A ': git add %val{buffile}<ret>' -docstring 'Add file'
 map global git c ': git add commit<ret>' -docstring 'Commit'
 map global git C ': git add commit --amend<ret>' -docstring 'Amend commit'
+map global git m ': git-line-blame<ret>' -docstring 'Blame selection lines'
 
 map global git r ': enter-user-mode git-r<ret>' -docstring 'Git re(base/set) mode'
 map global git-r f ': git reset HEAD^1 -- %val{buffile}<ret>' -docstring 'Split file out of last commit'
-map global git m ': git-line-blame<ret>' -docstring 'Blame selection lines'
 
 # Hunk
 map global git n ': git next-hunk<ret>' -docstring 'Next hunk'

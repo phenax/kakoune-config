@@ -30,13 +30,23 @@ add-highlighter global/ line '%val{cursor_line}' RowLine
 add-highlighter global/ regex \h+$ 0:Error # Highlight trailing whitespaces
 add-highlighter global/ wrap -word -indent # Softwrap long lines
 add-highlighter global/ show-matching -previous
-add-highlighter global/ show-whitespaces -spc ' ' -tab '│' -tabpad 'y' -lf '¬' -indent '│'
+add-highlighter global/ show-whitespaces -spc ' ' -tab '│' -lf '¬' -indent '│'
+hook global RegisterModified '/' %{
+  # Highlight current searchterm
+  add-highlighter -override global/search regex "%reg{/}" 0:search
+}
 
-# Search
-hook global RegisterModified '/' %{ add-highlighter -override global/search regex "%reg{/}" 0:search }
-map global user '<esc>' ': set-register slash ""<ret>'
-map global user '/' '/(?i)'
-map global user 'r' '*%s<ret>'
+# System keys
+map global user '<esc>' ': set-register slash ""<ret>' -docstring 'Clear search highlighting'
+map global normal '/' '/(?i)' # Remap / to case-insensitive search
+map global user '/' '/'
+map global user r '*%s<ret>' -docstring 'Replace selection'
+map global user s ': w<ret>' -docstring 'Save'
+map global normal <c-j> 15j -docstring '15 down'
+map global normal <c-k> 15k -docstring '15 up'
+# Clipboard management mappings
+map global user y "<a-|> xclip -selection clipboard<ret>" -docstring "yank the selection into the clipboard"
+map global user p "<a-!> xclip -selection clipboard -o<ret>" -docstring "paste the clipboard"
 
 declare-user-mode system
 map global user q ': enter-user-mode system<ret>' -docstring 'System mode'
@@ -63,22 +73,6 @@ hook global ModeChange .*:insert:.* %{ try %{
   unset-face window PrimaryCursorEol
 } }
 
-# Tmux window mode
-declare-user-mode win
-map global normal <c-w> ':enter-user-mode win<ret>' -docstring 'Window mode'
-map global win q ': quit<ret>' -docstring 'Quit'
-map global win v ': tmux-terminal-horizontal kak -c %val{session}<ret>' -docstring 'Split vertical'
-map global win s ': tmux-terminal-vertical kak -c %val{session}<ret>' -docstring 'Split horizontal'
-map global win h ': nop %sh{tmux select-pane -L}<ret>' -docstring 'Jump left'
-map global win j ': nop %sh{tmux select-pane -D}<ret>' -docstring 'Jump down'
-map global win k ': nop %sh{tmux select-pane -U}<ret>' -docstring 'Jump up'
-map global win l ': nop %sh{tmux select-pane -R}<ret>' -docstring 'Jump right'
-map global win z ': wq<ret>'
-
-# Clipboard management mappings
-map global user y "<a-|> xclip -selection clipboard<ret>" -docstring "yank the selection into the clipboard"
-map global user p "<a-!> xclip -selection clipboard -o<ret>" -docstring "paste the clipboard"
-
 # Code mode
 declare-user-mode code
 map global user c ':enter-user-mode code<ret>' -docstring 'Code mode'
@@ -91,41 +85,6 @@ map global code <a-k> :casekebab<ret> -docstring 'kebab-casing'
 map global code <a-_> :casesnake<ret> -docstring 'snake_casing'
 map global code <a-c> :casecamel<ret> -docstring 'camelCasing'
 
-# Quick move
-map global normal <c-j> 15j
-map global normal <c-k> 15k
-
 # Editorconfig
-hook global BufOpenFile .* %{ try %{editorconfig-load} }
-hook global BufNewFile .* %{ try %{editorconfig-load} }
-
-declare-user-mode surround
-declare-user-mode surround-append
-declare-user-mode surround-delete
-map global user s ': enter-user-mode surround<ret>'
-map global surround a ': enter-user-mode surround-append<ret>'
-map global surround d ': enter-user-mode surround-delete<ret>'
-
-define-command define-surround -params 3 %{
-  evaluate-commands %sh{
-    echo "map global surround-append %{${1}} %{i${2}<esc>a${3}}"
-    echo "map global surround-delete %{${1}} %{<a-a>${2}<a-S>d,}"
-  }
-}
-
-# hook global KakBegin .* %{
-#   define-surround ( ( )
-#   define-surround [ [ ]
-#   # define-surround < < >
-#   # define-surround '{' '{' '}'
-#   # define-surround '<' '<' '>'
-#   # define-surround '`' '`' '`'
-#   define-surround '"' '"' '"'
-#   # define-surround "'" "'" "'"
-# }
-
-
-hook global BufCreate .*[.]mdx %{
-  set-option buffer filetype markdown
-}
-
+hook global BufOpenFile .* %{ try %{ editorconfig-load } }
+hook global BufNewFile .* %{ try %{ editorconfig-load } }

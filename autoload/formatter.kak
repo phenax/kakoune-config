@@ -1,7 +1,9 @@
-# TODO: Use a single hook?
 hook global BufSetOption filetype=json %{ set-option buffer formatcmd "jq" }
+
 hook global BufSetOption filetype=fennel %{ set-option buffer formatcmd "fnlfmt -" }
+
 hook global BufSetOption filetype=nix %{ set-option buffer formatcmd "nixfmt -" }
+
 hook global BufSetOption filetype=(?:javascript|typescript) %{
   evaluate-commands %sh{
     if [ -f "$PWD/biome.json" ]; then
@@ -9,11 +11,10 @@ hook global BufSetOption filetype=(?:javascript|typescript) %{
     fi
   }
 }
+
 hook global BufSetOption filetype=(?:ruby) %{
   evaluate-commands %sh{
-    if [ -f "$PWD/.rubocop.yml" ]; then
-      echo "set-option buffer formatcmd %{rubocop -x --stderr -s '$kak_buffile'}"
-    fi
+    echo "set-option buffer formatcmd %{rubocop -x --stderr -s '$kak_buffile'}"
   }
 }
 
