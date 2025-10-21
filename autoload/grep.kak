@@ -9,6 +9,16 @@ define-command grep-write %{
   }
 }
 
-# TODO: Proper mappings for next/prev on results
-hook global -always BufOpenFifo '\*grep\*' %{ map global normal <minus> ': grep-next-match<ret>' }
-hook global -always BufOpenFifo '\*make\*' %{ map global normal <minus> ': make-next-error<ret>' }
+hook global -always BufOpenFifo '\*grep\*' %{
+  map global file ] ': grep-next-match<ret>'
+  map global file [ ': grep-previous-match<ret>'
+}
+hook global -always BufOpenFifo '\*make\*' %{
+  map global file ] ': make-next-error<ret>'
+  map global file [ ': make-previous-error<ret>'
+}
+
+# TODO: Prevent exiting command mode from grep
+# define-command live-grep %{
+#   prompt -on-change %{ eval %sh{ [ -z "$kak_text" ] || echo "grep $kak_text" } } 'live-grep: ' %{ info done }
+# }

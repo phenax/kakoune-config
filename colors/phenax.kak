@@ -2,7 +2,7 @@ evaluate-commands %sh{
   foreground="rgb:c5c8c6"
   foreground2="rgb:90a0a0"
   foreground3="rgb:709090"
-  foreground4="rgb:405050"
+  foreground4="rgb:304040"
   background="default"
   accent1="rgb:007070"
   accent2="rgb:009090"
@@ -157,8 +157,10 @@ evaluate-commands %sh{
     face global InfoDiagnosticWarning     ${orange},default
     face global InfoDiagnosticHint        ${purple},default
     face global InfoDiagnosticInformation ${purple},default
-    face global DiagnosticError ${red}+u
-    face global DiagnosticWarning ${yellow}+u
+    face global DiagnosticError ${red}+uf
+    face global DiagnosticWarning ${yellow}+uf
+    face global DiagnosticInfo ${purple}+f
+    face global DiagnosticHint ${purple}+f
     face global InlayDiagnosticError ${red}
     face global InlayDiagnosticWarning ${yellow}
     face global InlayDiagnosticHint ${purple}

@@ -1,5 +1,5 @@
 # Link builtin autoloads
-nop %sh{ ln -s "$kak_runtime/rc" "$kak_config/autoload/standard-library" 2>/dev/null || true }
+nop %sh{ ln -sf "$kak_runtime/rc" "$kak_config/autoload/standard-library" 2>/dev/null || true }
 evaluate-commands %sh{kcr init kakoune}
 evaluate-commands %sh{kak-tree-sitter -dksvv --init "${kak_session}" --with-highlighting --with-text-objects}
 
@@ -44,6 +44,7 @@ map global user r '*%s<ret>' -docstring 'Replace selection'
 map global user s ': w<ret>' -docstring 'Save'
 map global normal <c-j> 15j -docstring '15 down'
 map global normal <c-k> 15k -docstring '15 up'
+
 # Clipboard management mappings
 map global user y "<a-|> xclip -selection clipboard<ret>" -docstring "yank the selection into the clipboard"
 map global user p "<a-!> xclip -selection clipboard -o<ret>" -docstring "paste the clipboard"
@@ -81,10 +82,11 @@ map global code f :format<ret> -docstring 'Format buffer'
 def casecamel %{ exec '`s[-_<space>]<ret>d~<a-i>w' }
 def casesnake %{ exec '<a-:><a-;>s-|[a-z][A-Z]<ret>;a<space><esc>s[-\s]+<ret>c_<esc><a-i>w`' }
 def casekebab %{ exec '<a-:><a-;>s_|[a-z][A-Z]<ret>;a<space><esc>s[_\s]+<ret>c-<esc><a-i>w`' }
-map global code <a-k> :casekebab<ret> -docstring 'kebab-casing'
+map global code <a-minus> :casekebab<ret> -docstring 'kebab-casing'
 map global code <a-_> :casesnake<ret> -docstring 'snake_casing'
 map global code <a-c> :casecamel<ret> -docstring 'camelCasing'
 
 # Editorconfig
 hook global BufOpenFile .* %{ try %{ editorconfig-load } }
 hook global BufNewFile .* %{ try %{ editorconfig-load } }
+
