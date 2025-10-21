@@ -7,14 +7,13 @@ set-option global lsp_diagnostic_line_info_sign '■'
 set-option global lsp_diagnostic_line_hint_sign '■'
 lsp-enable
 
-map global user l ':enter-user-mode lsp<ret>' -docstring 'LSP mode'
+lsp-inlay-diagnostics-enable global
 
-map global object a '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
-map global object <a-a> '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
+map global user l ':enter-user-mode lsp<ret>' -docstring 'LSP mode'
+# map global user t ':enter-user-mode tree-sitter<ret>' -docstring 'Treesitter mode'
 map global object f '<a-semicolon>lsp-object Function Method<ret>' -docstring 'LSP function or method'
 map global object t '<a-semicolon>lsp-object Class Interface Struct<ret>' -docstring 'LSP class interface or struct'
 map global object d '<a-semicolon>lsp-diagnostic-object --include-warnings<ret>' -docstring 'LSP errors and warnings'
-map global object D '<a-semicolon>lsp-diagnostic-object<ret>' -docstring 'LSP errors'
 
 map global insert <c-n> '<a-;>:lsp-snippets-select-next-placeholders<ret>' -docstring 'Select next snippet placeholder'
 hook global InsertCompletionShow .* %{
@@ -48,7 +47,7 @@ hook global BufSetOption filetype=ruby %{
   }
 }
 
-hook global WinSetOption filetype=(?:javascript|typescript|ruby) %{
+hook global WinSetOption filetype=.* %{
   hook window -group semantic-tokens BufReload .* lsp-semantic-tokens
   hook window -group semantic-tokens NormalIdle .* lsp-semantic-tokens
   hook window -group semantic-tokens InsertIdle .* lsp-semantic-tokens

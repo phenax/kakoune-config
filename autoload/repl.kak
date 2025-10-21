@@ -1,57 +1,65 @@
-declare-option str xrepl_mode_config;
 declare-option bool xrepl_running false;
-declare-option str-to-str-map xrepl_modes;
+declare-option str xrepl_current_cmd;
+declare-option str xrepl_current_transform;
 
-set-option -add global xrepl_modes %{node={
-  "cmd": "node"
-}}
-set-option -add global xrepl_modes %{shell={
-  "cmd": "$SHELL",
-  "transform": "echo 'echo 123 $foooo :: \\$kak_buffile :: \\$kak_selection :: \\$kak_seletion_desc'"
-}}
+# TODO: Add env
+# TODO: Add clear screen
+# TODO: Migrate curly
+# TODO: Preserve original selection with send paragraph
+# TODO: Add prompt
+# TODO: Add send c-c
+# TODO: Add send buffile
 
-define-command xrepl-set-mode -params 1 %{
-  xrepl-quit
-  # TODO: This preevaluates the params in transform.
-  fennel %arg{1} %opt{xrepl_modes} %{
-    (local [mode & modestxt] [(args)])
-    (each [_ val (ipairs modestxt)]
-      (local (key config) (string.match val "^%s*([^=]*)=(.*)$"))
-      (kak.info config)
-      (when (= key mode)
-        (kak.set "global" "xrepl_mode_config" config)))
+declare-user-mode repl-mode-select
+define-command define-repl-mode -params 3 %{
+  map global repl-mode-select %arg{1} -docstring %arg{2} %sh{
+    kak_escape() { printf "'"; printf '%s' "$1" | sed "s/'/''/g"; printf "'"; }
+    printf ": xrepl-quit<ret>"
+    printf ": evaluate-commands $(kak_escape "$(echo "$3" | tr '\n' ';')")<ret>"
+    printf ": xrepl-begin<ret>"
   }
-  xrepl-begin
 }
 
-define-command xrepl-select %{
-  fennel %opt{xrepl_modes} %{
-    (local modes [(args)])
-    (local modenames [])
-    (each [_ val (ipairs modes)]
-      (local (key _config) (string.match val "^%s*([^=]*)=(.*)$"))
-      (when key (table.insert modenames key)))
-    (local compl (.. "echo -e \"" (table.concat modenames "\n") "\""))
-    (kak.prompt :-menu
-                :-shell-script-candidates compl
-                "repl mode: "
-                "xrepl-set-mode %val{text}")
-  }
+define-repl-mode n 'Node' %{
+  set global xrepl_current_cmd 'node'
+  set global xrepl_current_transform ""
+}
+define-repl-mode s 'Shell' %{
+  set global xrepl_current_cmd '$SHELL'
+  set global xrepl_current_transform ""
+}
+define-repl-mode j 'Jest' %{
+  set global xrepl_current_cmd '$SHELL'
+  set global xrepl_current_transform 'cat > /dev/null
+    echo "cd \"$(dirname "$kak_buffile")\" && npx jest --runTestsByPath \\\"$kak_buffile\\\";"
+  '
+}
+define-repl-mode c 'Cypress' %{
+  set global xrepl_current_cmd '$SHELL'
+  set global xrepl_current_transform 'cat > /dev/null
+    echo "npx cypress run --headless --e2e --spec $kak_buffile;"
+  '
+}
+define-repl-mode a 'AI: Gemini' %{
+  set global xrepl_current_cmd 'gemini'
+  set global xrepl_current_transform ""
 }
 
 define-command xrepl-send-command %{
-  evaluate-commands %sh{
-    transform="$(echo "$kak_opt_xrepl_mode_config" | jq -rj '.transform? // ""')"
+  evaluate-commands -draft %sh{
+    transform="$kak_opt_xrepl_current_transform"
     value="$kak_selection"
     if ! [ -z "$transform" ]; then
-      export kak_buffile="$kak_buffile"
-      export kak_selection="$kak_selection"
-      export kak_selection_desc="$kak_selection_desc"
-      value=$(echo "$value" | foooo=qwe sh -c "$transform")
+      export kak_buffile kak_selection kak_selection_desc kak_cursor_line kak_cursor_column
+      value=$(echo "$kak_selection" | sh -c "$transform")
     fi
-    echo "info %{$value//$transform\n$kak_opt_xrepl_mode_config}"
-    echo "repl-send-text %{$value}"
+    echo -e "repl-send-text %{$value\n}"
   }
+}
+
+define-command xrepl-send-paragraph %{
+  execute-keys '<a-i>p'
+  xrepl-send-command
 }
 
 define-command xrepl-send-keys -params 1.. %{
@@ -70,7 +78,7 @@ define-command xrepl-quit %{
 define-command xrepl-begin %{
   evaluate-commands %sh{
     if [ "$kak_opt_xrepl_running" = "false" ]; then
-      init_cmd="$(echo "$kak_opt_xrepl_mode_config" | jq -rj '.cmd? // ""')"
+      init_cmd="$kak_opt_xrepl_current_cmd"
       if [ -z "$init_cmd" ]; then init_cmd="$SHELL"; fi
       echo "set-option global xrepl_running true"
       echo "repl-new $init_cmd"
@@ -83,9 +91,10 @@ declare-user-mode repl
 map global normal <c-t> ': enter-user-mode repl<ret>'
 map global repl <c-t> ': xrepl-begin<ret>'
 map global repl t ': xrepl-begin<ret>'
-map global repl <ret> '<c-s><a-i>p: xrepl-send-command<ret><c-o>'
+map global repl <ret> ': xrepl-send-paragraph<ret>'
 map global repl l ': xrepl-send-command<ret>'
 map global repl r ': xrepl-send-keys Enter<ret>'
 map global repl c ': xrepl-send-keys C-c<ret>'
 map global repl q ': xrepl-quit<ret>'
-map global repl <tab> ': xrepl-select<ret>'
+# map global repl <tab> ': xrepl-select<ret>'
+map global repl <tab> ': enter-user-mode repl-mode-select<ret>'

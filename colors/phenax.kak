@@ -60,8 +60,8 @@ evaluate-commands %sh{
     face global inlineUnderline ${foreground}+fu
     face global inlineCode ${foreground2},${mildhighlight2}+a
     face global inlineLink ${accent2}+a
-    face global header1 ${accent2}+b
-    face global header2 ${accent3}+b
+    face global header1 ${accent3}+b
+    face global header2 ${accent1}+b
     face global header3 ${blue1}+b
     face global header4 ${green}+b
     face global header5 ${purple}+b
@@ -109,8 +109,6 @@ evaluate-commands %sh{
     face global MenuInfo ${red}
     face global Information ${foreground2},${background}
     face global Error ${foreground},${red}
-    face global DiagnosticError ${red}+u
-    face global DiagnosticWarning ${yellow}+u
     face global StatusLine ${foreground},${background}
     face global StatusLineMode ${yellow}+b
     face global StatusLineInfo ${aqua},default
@@ -145,19 +143,25 @@ evaluate-commands %sh{
     face global LineFlagError             ${red},default
     face global LineFlagWarning           ${orange},default
     face global LineFlagHint              ${purple},default
-    face global LineFlagInfo              Information
+    face global LineFlagInfo              ${purple},default
     face global InfoDefault               Information
     face global InfoBlock                 Information
     face global InfoBlockQuote            Information
     face global InfoBullet                Information
-    face global InfoHeader                Information
+    face global InfoHeader                default,default+b
     face global InfoLink                  Information
     face global InfoLinkMono              Information
     face global InfoMono                  Information
     face global InfoRule                  Information
-    face global InfoDiagnosticError       Information
-    face global InfoDiagnosticHint        Information
-    face global InfoDiagnosticInformation Information
-    face global InfoDiagnosticWarning     Information
+    face global InfoDiagnosticError       ${red},default
+    face global InfoDiagnosticWarning     ${orange},default
+    face global InfoDiagnosticHint        ${purple},default
+    face global InfoDiagnosticInformation ${purple},default
+    face global DiagnosticError ${red}+u
+    face global DiagnosticWarning ${yellow}+u
+    face global InlayDiagnosticError ${red}
+    face global InlayDiagnosticWarning ${yellow}
+    face global InlayDiagnosticHint ${purple}
+    face global InlayDiagnosticInfo ${purple}
   "
 }
