@@ -64,16 +64,6 @@ define-command enter-user-mode-with-count -params 1 %{
   enter-user-mode %arg{1}
 }
 
-# Mode cursors
-hook global ModeChange .*:.*:insert %{
-  set-face window PrimaryCursor InsertCursor
-  set-face window PrimaryCursorEol InsertCursor
-}
-hook global ModeChange .*:insert:.* %{ try %{
-  unset-face window PrimaryCursor
-  unset-face window PrimaryCursorEol
-} }
-
 # Code mode
 declare-user-mode code
 map global user c ':enter-user-mode code<ret>' -docstring 'Code mode'
