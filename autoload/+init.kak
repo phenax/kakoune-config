@@ -13,7 +13,7 @@ set-option global autoreload yes
 set-option global incsearch true
 set-option global indentwidth 2
 set-option global tabstop 2
-set-option global path -add "**"
+set-option -add global path "**"
 set-option global startup_info_version 20250603
 set-option global scrolloff 10,3
 set-option -add global ui_options terminal_enable_mouse=false terminal_set_title=true

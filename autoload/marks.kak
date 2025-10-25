@@ -1,69 +1,27 @@
-declare-option str marks_path
-declare-option str marks_name
-
-hook global KakBegin .* %{
-  set-option global marks_path %sh{
-    datadir="${XDG_DATA_HOME:-"$HOME/.local/share"}"
-    echo "$datadir/kak/marks"
-  }
-}
-
-hook global EnterDirectory .* %{ evaluate-commands %sh{
-  if [ -z "$kak_marks_name" ]; then
-    name=$(pwd | tr '/' '-' | tr ' ' '_')
-    echo "set-option global marks_name $name"
-  fi
-} }
-
 define-command marks-add -params 1..2 %{
-  nop %sh{
-    [ -z "$kak_opt_marks_path" ] && exit 1
-    mkdir -p "$kak_opt_marks_path"
-    path="$kak_opt_marks_path/$kak_opt_marks_name"
-    [ -f "$path" ] || touch "$path"
-    newfile="$1"
-    pos="$2"
-    if [ -z "$pos" ] || [ "$pos" = "0" ]; then
-      pos="99";
-    else
-      pos="$(echo "$pos" | awk '{printf "%.1f", $1 <= 1 ? 0 : $1 - 0.5}')";
-    fi
-    function append() { cat; echo -e "$pos\t$newfile"; }
-    newfiles=$(grep -v -F "$newfile" "$path" \
-                | nl | sed 's/^\s*//' \
-                | append | LC_ALL=C sort -g -b -k 2 | uniq -f1 | LC_ALL=C sort -g -b \
-                | sed 's/^\s*[-.0-9]\+\s\+//')
-    echo -e "$newfiles" > "$path.tmp"
-    mv "$path.tmp" "$path" || true
-    rm -f "$path.tmp" || true
-  }
+  nop %sh{ "$kak_config/scripts/marks.fnl" add "$1" "$2" }
   marks-show
 }
 
 define-command marks-delete -params 1 %{
-  nop %sh{
-    path="$kak_opt_marks_path/$kak_opt_marks_name"
-    [ -f "$path" ] && sed -i "/$(echo "$1" | tr '/' '.')/d" "$path" || true
-  }
+  nop %sh{ "$kak_config/scripts/marks.fnl" delete "$1" }
   delete-buffer %arg{1}
   marks-show
 }
 
 define-command marks-clear %{
-  nop %sh{
-    path="$kak_opt_marks_path/$kak_opt_marks_name"
-    [ -f "$path" ] && rm -f "$path" || true
-  }
+  nop %sh{ "$kak_config/scripts/marks.fnl" clear }
 }
 
 define-command marks-show %{
   info -title 'marks' -markup %sh{
     path="$kak_opt_marks_path/$kak_opt_marks_name"
     echo -n "{Default}"
-    if ! [ -f "$path" ] || [ "$(wc -l "$path")" = "0" ]; then
+    marks=$("$kak_config/scripts/marks.fnl" show)
+    if [ -z "$marks" ]; then
       echo "{comment}<empty>" && exit 0;
     fi
-    cat "$path" | while IFS= read file; do
+    echo "$marks" | while IFS= read file; do
       short_path=$(echo "$file" | awk -F/ '{if (NF >= 2) {print $(NF-1) "/" $NF} else {print $NF}}')
       hl=$([ "$file" = "$kak_buffile" ] && echo "{keyword}" || echo "{Default}")
       echo "${hl}${short_path} {comment}$(realpath -s --relative-to="$PWD" "$file"){Default}"
@@ -73,12 +31,8 @@ define-command marks-show %{
 
 define-command marks-switch -params 1 %{
   evaluate-commands %sh{
-    path="$kak_opt_marks_path/$kak_opt_marks_name"
-    [ -f "$path" ] || exit 0
-    count="${1:-0}"
-    [ "$count" = "0" ] && exit 0
-    file=$(cat "$path" | sed -n "${count}p")
-    [ -z "$file" ] || echo "edit $file"
+    mark=$("$kak_config/scripts/marks.fnl" get "${1:-0}")
+    [ -z "$mark" ] || echo "edit $mark"
   }
   marks-show
 }
