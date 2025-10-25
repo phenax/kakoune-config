@@ -18,7 +18,7 @@ set-option global startup_info_version 20250603
 set-option global scrolloff 10,3
 set-option -add global ui_options terminal_enable_mouse=false terminal_set_title=true
 set-option global modelinefmt \
-  '{StatusLineDetails}{{context_info}} {{mode_info}}
+'{StatusLineDetails}{{context_info}} {{mode_info}}
 %val{cursor_line}/%val{buf_line_count}:%val{cursor_char_column}
 {StatusLineBufname}%sh{echo "$kak_bufname" | awk -F/ "{if (NF >= 2) {print \$(NF-1) \"/\" \$NF} else {print \$NF}}"}'
 
@@ -36,16 +36,14 @@ hook global RegisterModified '/' %{
   add-highlighter -override global/search regex "%reg{/}" 0:search
 }
 
-# System keys
+# Misc keys
 map global user '<esc>' ': set-register slash ""<ret>' -docstring 'Clear search highlighting'
 map global normal '/' '/(?i)' # Remap / to case-insensitive search
 map global user '/' '/'
-map global user r '*%s<ret>' -docstring 'Replace selection'
 map global user s ': w<ret>' -docstring 'Save'
 map global normal <c-j> 15j -docstring '15 down'
 map global normal <c-k> 15k -docstring '15 up'
 
-# Clipboard management mappings
 map global user y "<a-|> xclip -selection clipboard<ret>" -docstring "yank the selection into the clipboard"
 map global user p "<a-!> xclip -selection clipboard -o<ret>" -docstring "paste the clipboard"
 
