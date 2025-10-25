@@ -77,4 +77,3 @@ map global code <a-c> :casecamel<ret> -docstring 'camelCasing'
 # Editorconfig
 hook global BufOpenFile .* %{ try %{ editorconfig-load } }
 hook global BufNewFile .* %{ try %{ editorconfig-load } }
-
