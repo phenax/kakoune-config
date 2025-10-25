@@ -1,5 +1,5 @@
 define-command gitui -params .. %{
-  connect terminal env "EDITOR=kak -c %val{session}" "VISUAL=kak -c %val{session}" gitu %arg{@}
+  connect terminal env "GIT_EDITOR=kak -c %val{session}" "EDITOR=kcr edit" "VISUAL=kcr edit" gitu %arg{@}
 }
 
 declare-user-mode git

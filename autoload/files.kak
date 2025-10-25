@@ -1,7 +1,10 @@
-def find -docstring "find files" -menu -params 1 %{ edit -existing %arg{1} } \
-         -shell-script-candidates %{ fd -t f --hidden --color=never -E .git }
+def find -docstring "find files" -menu -params 1 \
+  %{ edit -existing %arg{1} } \
+  -shell-script-candidates %{ fd -t f --hidden --color=never -E .git }
 
-def file-manager -params .. %{ connect terminal env "EDITOR=kcr edit" daffm -c @kak %arg{@} }
+def file-manager -params .. %{
+  connect terminal env "EDITOR=kcr edit" sh -c "DAFFM_PATH_RELATIVE_TO=$PWD daffm -c @kak %arg{@};"
+}
 
 declare-user-mode buffer
 map global user b ': enter-user-mode buffer<ret>' -docstring 'Buffer mode'
