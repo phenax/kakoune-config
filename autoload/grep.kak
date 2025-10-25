@@ -17,8 +17,3 @@ hook global -always BufOpenFifo '\*make\*' %{
   map global file ] ': make-next-error<ret>'
   map global file [ ': make-previous-error<ret>'
 }
-
-# TODO: Prevent exiting command mode from grep
-# define-command live-grep %{
-#   prompt -on-change %{ eval %sh{ [ -z "$kak_text" ] || echo "grep $kak_text" } } 'live-grep: ' %{ info done }
-# }

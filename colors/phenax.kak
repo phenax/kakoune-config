@@ -2,7 +2,7 @@ evaluate-commands %sh{
   foreground="rgb:c5c8c6"
   foreground2="rgb:90a0a0"
   foreground3="rgb:709090"
-  foreground4="rgb:304040"
+  foreground4="rgb:405050"
   background="default"
   accent1="rgb:007070"
   accent2="rgb:009090"
@@ -73,7 +73,8 @@ evaluate-commands %sh{
     face global orgTaskStateTodo ${black},${red}+b
     face global orgTaskStateDone ${black},${green}+b
     face global orgTaskStateActive ${black},${orange}+b
-    face global orgCodeBlock ${foreground2},${mildhighlight1}+a
+    face global markup_codeblock ${foreground2},${mildhighlight1}+a
+    face global orgCodeBlock markup_codeblock
   "
 
   ## Custom
@@ -122,6 +123,15 @@ evaluate-commands %sh{
 
   ## treesitter
   echo "
+    face global ts_title title
+    face global ts_heading heading
+    face global ts_markup_heading_1 header1
+    face global ts_markup_heading_2 header2
+    face global ts_markup_heading_3 header3
+    face global ts_markup_heading_4 header4
+    face global ts_markup_heading_5 header5
+    face global ts_markup_heading_6 header6
+    face global ts_markup_raw_inline markup_codeblock
     face global ts_value value
     face global ts_type type
     face global ts_variable variable

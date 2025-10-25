@@ -1,8 +1,8 @@
 declare-user-mode org
-hook global WinSetOption filetype=org %{
-  map window normal <ret> ': orgmode-jump-link<ret>' -docstring 'Jump to link'
-  map window user o ': enter-user-mode org<ret>' -docstring 'Org mode'
-  map window org <tab> ': orgmode-toggle<ret>' -docstring 'Toggle checkbox/task'
+hook global BufSetOption filetype=org %{
+  map buffer normal <ret> ': orgmode-jump-link<ret>' -docstring 'Jump to link'
+  map buffer user o ': enter-user-mode org<ret>' -docstring 'Org mode'
+  map buffer org <tab> ': orgmode-toggle<ret>' -docstring 'Toggle checkbox/task'
 }
 
 define-command orgmode-toggle %{
