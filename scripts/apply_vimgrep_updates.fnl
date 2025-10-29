@@ -1,5 +1,7 @@
 #!/usr/bin/env -S fennel --lua luajit
 
+;; TODO: Support -A -B outputs for context
+
 (local M {})
 
 (fn M.main []

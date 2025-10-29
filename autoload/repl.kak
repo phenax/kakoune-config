@@ -3,6 +3,7 @@ declare-option str xrepl_current_cmd;
 declare-option str xrepl_current_transform;
 declare-option bool xrepl_current_clear_screen false;
 
+# TODO: Use register set to selection (paragraph) instead of selection
 # TODO: Add env
 # TODO: Migrate curly
 # TODO: Preserve original selection with send paragraph

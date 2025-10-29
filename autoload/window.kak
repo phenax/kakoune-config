@@ -9,16 +9,18 @@ map global win z ': wq<ret>'
 
 define-command terminal-singleton -params 2.. -docstring 'terminal-singleton <name> <command> [args...]' %{
   eval %sh{
-    name="$1"; shift;
+    name="$1"; shift 1;
     open-term-win() {
       printf "terminal -n '$name' env"
       printf " 'KAKOUNE_SESSION=$kak_session' 'KAKOUNE_CLIENT=$kak_client'"
-      printf " %q" "$@"
+      for arg in "$@"; do
+        printf ' "%s"' "$(echo "$arg" | sed 's/["]/\\"/g')"
+      done
     }
     focus-term-win() {
       tmux select-window -t "$name" >/dev/null 2>&1
     }
 
-    focus-term-win || open-term-win "$@";
+    (focus-term-win || open-term-win "$@")
   }
 }

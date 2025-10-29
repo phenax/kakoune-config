@@ -32,6 +32,7 @@ evaluate-commands %sh{
     face global value ${blue1}
     face global type ${blue1}
     face global variable ${blue1}
+    face global numeric ${orange}
     face global module ${blue1}
     face global function ${blue2}
     face global string ${green}
@@ -145,6 +146,10 @@ evaluate-commands %sh{
     face global ts_documentation documentation
     face global ts_meta meta
     face global ts_builtin builtin
+    face global ts_constant_numeric numeric
+    face global ts_constant_builtin numeric
+    face global ts_constant_builtin_boolean numeric
+    face global ts_string_special_symbol variable
     face global ts_punctuation_bracket ${foreground4},default
   "
 
