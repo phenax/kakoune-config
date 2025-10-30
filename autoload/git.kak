@@ -1,6 +1,8 @@
 define-command gitui -params .. %{
   terminal-singleton git \
-    env "GIT_EDITOR=kak -c %val{session}" 'EDITOR=kcr edit' 'VISUAL=kcr edit' \
+    env "GIT_EDITOR=kak -c %val{session}" \
+    'EDITOR=kcr edit' \
+    'VISUAL=kcr edit' \
     gitu %arg{@}
 }
 

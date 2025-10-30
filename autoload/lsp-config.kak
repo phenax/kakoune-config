@@ -9,18 +9,18 @@ lsp-enable
 
 lsp-inlay-diagnostics-enable global
 
-map global user l ':enter-user-mode lsp<ret>' -docstring 'LSP mode'
+map global user l ': enter-user-mode lsp<ret>' -docstring 'LSP mode'
 # map global user t ':enter-user-mode tree-sitter<ret>' -docstring 'Treesitter mode'
 map global object f '<a-semicolon>lsp-object Function Method<ret>' -docstring 'LSP function or method'
 map global object t '<a-semicolon>lsp-object Class Interface Struct<ret>' -docstring 'LSP class interface or struct'
 map global object d '<a-semicolon>lsp-diagnostic-object --include-warnings<ret>' -docstring 'LSP errors and warnings'
 
-map global insert <c-n> '<a-;>:lsp-snippets-select-next-placeholders<ret>' -docstring 'Select next snippet placeholder'
+map global insert <c-n> '<a-;>: lsp-snippets-select-next-placeholders<ret>' -docstring 'Select next snippet placeholder'
 hook global InsertCompletionShow .* %{
-  unmap global insert <c-n> '<a-;>:lsp-snippets-select-next-placeholders<ret>'
+  unmap global insert <c-n> '<a-;>: lsp-snippets-select-next-placeholders<ret>'
 }
 hook global InsertCompletionHide .* %{
-  map global insert <c-n> '<a-;>:lsp-snippets-select-next-placeholders<ret>' -docstring 'Select next snippet placeholder'
+  map global insert <c-n> '<a-;>: lsp-snippets-select-next-placeholders<ret>' -docstring 'Select next snippet placeholder'
 }
 
 hook global BufSetOption filetype=(?:javascript|typescript) %{
@@ -36,6 +36,15 @@ hook global BufSetOption filetype=(?:javascript|typescript) %{
     # [biome]
     # root_globs = ["biome.json", "package.json", "tsconfig.json", "jsconfig.json"]
     # args = ["lsp-proxy"]
+  }
+}
+
+remove-hooks global lsp-filetype-c-family
+hook global BufSetOption filetype=(?:c|cpp|objc) %{
+  set-option buffer lsp_servers %{
+    [clangd]
+    args = ["--log=error"]
+    root_globs = ["compile_commands.json", ".clangd", ".git"]
   }
 }
 

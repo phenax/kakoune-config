@@ -1,42 +1,27 @@
-# declare-option -hidden str-list snippet_list
+hook global BufSetOption filetype=(?:javascript|typescript|jsx|tsx) %{
+  define-snippet buffer snip-react-component
+  define-snippet buffer snip-react-usestate
+}
 
-# define-command snippets-insert %{
-#   evaluate-commands %sh{
-#     cmds="echo $(echo "$kak_opt_snippet_list" | sed 's/=.*//')"
-#     # TODO: Fix this shit
-#     echo "prompt -menu -shell-script-candidates '$cmd' 'Snippet: ' 'evaluate-commands %val{text}'"
-#   }
-# }
+define-command snip-react-usestate %{
+  prompt 'Name: ' %{
+    set-register n %val{text}
+    prompt 'Initial value: ' %{
+      set-register v %val{text}
+      evaluate-commands %sh{
+        st=$(echo "$kak_reg_n" | sed 's/^[A-Z]/\L\0/')
+        setst="set$(echo "$kak_reg_n" | sed 's/^[a-z]/\U\0/')"
+        echo "execute-keys '<esc>,iconst [$st, $setst] = useState($kak_reg_v);<esc>'"
+      }
+    }
+  }
+}
 
-# map global normal <c-p> ':snippets-insert<ret>'
-
-# define-command define-snippet -params 3 %{
-#   set-option -add %arg{1} snippet_list %sh{ echo -e "$2=$3\n" }
-# }
-
-# define-snippet global "React component" snip-react-component
-# define-snippet global "React useState" snip-react-usestate
-
-# # hook global BufSetOption filetype=(?:javascript|typescript) %{
-# #   define-snippet buffer "React component" snip-react-component
-# #   define-snippet buffer "React useState" snip-react-usestate
-# # }
-
-# define-command snip-react-usestate %{
-#   prompt 'Name: ' %{
-#     evaluate-commands %sh{
-#       echo "info %{$kak_text}"
-#       st=$(echo "$kak_text" | sed 's/^[A-Z]/\L\0/')
-#       setst="set$(echo "$kak_text" | sed 's/^[a-z]/\U\0/')"
-#       echo "execute-keys '<esc>,iconst [$st, $setst] = useState();<esc>'"
-#     }
-#   }
-# }
-
-# define-command snip-react-component %{
-#   prompt 'Component name: ' %{
-#     execute-keys "<esc>,iconst %val{text} = ({ children }: React.PropsWithChildren) => {<ret>"
-#     execute-keys "  return <lt>div><lt>/div>;"
-#     execute-keys "<ret>}<esc>"
-#   }
-# }
+define-command snip-react-component %{
+  prompt 'Component name: ' %{
+    execute-keys "<esc>,itype %val{text}Prop = {<ret>}<ret><ret>"
+    execute-keys "<esc>,iexport const %val{text} = ({  }: %val{text}Prop) => {<ret>"
+    execute-keys "  return <lt>div><lt>/div>;"
+    execute-keys "<ret>};<esc>kwlt;"
+  }
+}
