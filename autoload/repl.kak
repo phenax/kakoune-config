@@ -42,7 +42,10 @@ define-repl-mode c 'Cypress' %{
   '
   set global xrepl_current_clear_screen true
 }
-define-repl-mode a 'AI: Gemini' %{
+define-repl-mode a 'AI: Local' %{
+  set global xrepl_current_cmd 'aichat'
+}
+define-repl-mode g 'AI: Gemini' %{
   set global xrepl_current_cmd 'gemini'
 }
 
