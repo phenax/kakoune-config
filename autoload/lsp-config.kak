@@ -1,4 +1,10 @@
 eval %sh{kak-lsp}
+# Disable default server configs
+remove-hooks global lsp-filetype-javascript
+remove-hooks global lsp-filetype-c-family
+remove-hooks global lsp-filetype-ruby
+remove-hooks global lsp-filetype-haskell
+
 set-option global lsp_file_watch_support true
 set-option global lsp_snippet_support true
 set-option global lsp_diagnostic_line_error_sign ''
@@ -23,27 +29,33 @@ hook global InsertCompletionHide .* %{
   map global insert <c-n> '<a-;>: lsp-snippets-select-next-placeholders<ret>' -docstring 'Select next snippet placeholder'
 }
 
-hook global BufSetOption filetype=(?:javascript|typescript) %{
+hook global BufSetOption filetype=(?:javascript|typescript|tsx|jsx) %{
   set-option buffer lsp_servers %{
     [typescript-language-server]
+    args = ["--stdio"]
     root_globs = ["package.json", "tsconfig.json", "jsconfig.json", ".git"]
-    args = ["--stdio"]
+    settings_section = "_"
+    [typescript-language-server.settings]
+    format = { enable = false }
+    [typescript-language-server.settings._]
+    quotePreference = "single"
+
     [tailwindcss-language-server]
-    root_globs = ["tailwind.*", "postcss.*"]
     args = ["--stdio"]
+    root_globs = ["tailwind.*", "postcss.config.*"]
     [tailwindcss-language-server.settings.tailwindCSS]
     editor = {}
-    # [biome]
-    # root_globs = ["biome.json", "package.json", "tsconfig.json", "jsconfig.json"]
-    # args = ["lsp-proxy"]
+
+    [biome]
+    args = ["lsp-proxy"]
+    root_globs = ["biome.json"]
   }
 }
 
-remove-hooks global lsp-filetype-c-family
 hook global BufSetOption filetype=(?:c|cpp|objc) %{
   set-option buffer lsp_servers %{
     [clangd]
-    args = ["--log=error"]
+    args = [ "--log=info", "--clang-tidy" ]
     root_globs = ["compile_commands.json", ".clangd", ".git"]
   }
 }
@@ -51,8 +63,27 @@ hook global BufSetOption filetype=(?:c|cpp|objc) %{
 hook global BufSetOption filetype=ruby %{
   set-option buffer lsp_servers %{
     [ruby-lsp]
-    root_globs = ["Gemfile"]
     args = ["stdio"]
+    root_globs = ["Gemfile"]
+
+    [rubocop]
+    command = "bundle"
+    args = ["exec", "rubocop", "--lsp"]
+    root_globs = ["Gemfile", ".git"]
+  }
+}
+
+hook -group lsp-filetype-haskell global BufSetOption filetype=haskell %{
+  set-option buffer lsp_servers %{
+    [haskell-language-server]
+    command = "haskell-language-server-wrapper"
+    args = ["--lsp"]
+    root_globs = ["hie.yaml", "cabal.project", "Setup.hs", "stack.yaml", "*.cabal"]
+    settings_section = "_"
+    [haskell-language-server.settings]
+    hlintOn = true
+    [haskell-language-server.settings._]
+    haskell.formattingProvider = "ormolu"
   }
 }
 
@@ -60,9 +91,7 @@ hook global WinSetOption filetype=.* %{
   hook window -group semantic-tokens BufReload .* lsp-semantic-tokens
   hook window -group semantic-tokens NormalIdle .* lsp-semantic-tokens
   hook window -group semantic-tokens InsertIdle .* lsp-semantic-tokens
-  hook -once -always window WinSetOption filetype=.* %{
-    remove-hooks window semantic-tokens
-  }
+  hook -once -always window WinSetOption filetype=.* %{ remove-hooks window semantic-tokens }
 
   set-option window lsp_semantic_tokens %{
     [
@@ -81,4 +110,3 @@ hook global WinSetOption filetype=.* %{
     ]
   }
 }
-

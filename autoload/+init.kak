@@ -1,7 +1,8 @@
 # Link builtin autoloads
 nop %sh{ ln -sf "$kak_runtime/rc" "$kak_config/autoload/standard-library" 2>/dev/null || true }
-evaluate-commands %sh{kcr init kakoune}
-evaluate-commands %sh{kak-tree-sitter -dksvv --init "${kak_session}" --with-highlighting --with-text-objects}
+
+eval %sh{kak-tree-sitter -dksvv --init "${kak_session}" --with-highlighting --with-text-objects}
+eval %sh{kcr init kakoune}
 
 hook global KakBegin .* %{
   require-module luar
@@ -18,7 +19,7 @@ set-option global startup_info_version 20250603
 set-option global scrolloff 10,3
 set-option -add global ui_options terminal_enable_mouse=false terminal_set_title=true
 set-option global modelinefmt \
-'{StatusLineDetails}{{context_info}} {{mode_info}}
+'%opt{lsp_modeline_progress} {StatusLineDetails}{{context_info}} {{mode_info}}
 %val{cursor_line}/%val{buf_line_count}:%val{cursor_char_column}
 {StatusLineBufname}%sh{echo "$kak_bufname" | awk -F/ "{if (NF >= 2) {print \$(NF-1) \"/\" \$NF} else {print \$NF}}"}'
 
@@ -49,10 +50,12 @@ map global user p "<a-!> xclip -selection clipboard -o<ret>" -docstring "paste t
 
 declare-user-mode system
 map global user q ': enter-user-mode system<ret>' -docstring 'System mode'
-map global system o ':echo %opt{}<left>'
-map global system v ':echo %val{}<left>'
-map global system d ':buffer *debug*<ret>'
-map global system f ':fennel %{()}<left><left>'
+map global system o ':echo %opt{}<left>' -docstring 'Print opt'
+map global system v ':echo %val{}<left>' -docstring 'Print value'
+map global system d ': buffer *debug*<ret>' -docstring 'Switch to debug buffer'
+map global system f ':set buffer filetype ' -docstring 'Set filetype'
+map global system m ':set buffer makecmd ""<left>' -docstring 'Set compile command'
+map global system p ': info %val{buffile}<ret>' -docstring 'Print file path'
 
 # Preserve count for user modes (look for alternatives)
 # TODO: Reset count on modechange?
@@ -64,15 +67,20 @@ define-command enter-user-mode-with-count -params 1 %{
 
 # Code mode
 declare-user-mode code
-map global user c ':enter-user-mode code<ret>' -docstring 'Code mode'
-map global code c :comment-line<ret> -docstring 'Comment/uncomment lines'
-map global code f :format<ret> -docstring 'Format buffer'
+map global user c ': enter-user-mode code<ret>' -docstring 'Code mode'
+map global code c ': comment-line<ret>' -docstring 'Comment/uncomment lines'
+map global code f ': apply-formatting<ret>' -docstring 'Apply configured formatter'
 def casecamel %{ exec '`s[-_<space>]<ret>d~<a-i>w' }
 def casesnake %{ exec '<a-:><a-;>s-|[a-z][A-Z]<ret>;a<space><esc>s[-\s]+<ret>c_<esc><a-i>w`' }
 def casekebab %{ exec '<a-:><a-;>s_|[a-z][A-Z]<ret>;a<space><esc>s[_\s]+<ret>c-<esc><a-i>w`' }
-map global code <a-minus> :casekebab<ret> -docstring 'kebab-casing'
-map global code <a-_> :casesnake<ret> -docstring 'snake_casing'
-map global code <a-c> :casecamel<ret> -docstring 'camelCasing'
+map global code <a-minus> ': casekebab<ret>' -docstring 'kebab-casing'
+map global code <a-_> ': casesnake<ret>' -docstring 'snake_casing'
+map global code <a-c> ': casecamel<ret>' -docstring 'camelCasing'
+
+declare-user-mode ai
+map global code a ': enter-user-mode ai<ret>' -docstring 'AI'
+map global ai ! '!ai ""<left>' -docstring 'Insert output'
+map global ai | '|ai ""<left>' -docstring 'Replace output'
 
 # Editorconfig
 hook global BufOpenFile .* %{ try %{ editorconfig-load } }
