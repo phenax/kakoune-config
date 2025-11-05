@@ -17,3 +17,20 @@
 # define-surround '"' '"' '"' '"'
 # define-surround "'" "'" "'" "'"
 # define-surround t "c<lt>div,<lt>/div<gt><ret>" "<lt>div<gt>" "<lt>/div<gt>"
+
+
+# declare-option range-specs ghost_completion;
+# add-highlighter global/ replace-ranges ghost_completion
+
+# hook global ModeChange .*:insert:.* %{
+#   unset buffer ghost_completion
+# }
+
+# map global insert <c-o> '<a-;>: appsugg<ret>'
+
+# def appsugg %{
+#   set buffer ghost_completion %val{timestamp} %sh{
+#     result=$(ai "$kak_selections")
+#     echo -e "$kak_selection_desc|{comment}$result{Default}"
+#   }
+# }

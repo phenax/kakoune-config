@@ -5,13 +5,13 @@ hook global BufSetOption filetype=org %{
   map buffer org <tab> ': orgmode-toggle<ret>' -docstring 'Toggle checkbox/task'
 }
 
-define-command orgmode-toggle %{
+def orgmode-toggle %{
   evaluate-commands -save-regs '#/' %{
     try %{ orgmode-toggle-checkbox } catch %{ orgmode-toggle-task-state } catch %{ }
   }
 }
 
-define-command orgmode-jump-link %{
+def orgmode-jump-link %{
   # TODO: support multiple links in single line
   evaluate-commands %{ try %{
     execute-keys ',xs\[\[([^\n\]]+)\]<ret>'
@@ -30,7 +30,7 @@ define-command orgmode-jump-link %{
   } }
 }
 
-define-command orgmode-toggle-checkbox %{
+def orgmode-toggle-checkbox %{
   evaluate-commands %{
     execute-keys ',xs^(\h*-\h+)\[([Xx\- ])\]<ret>'
     evaluate-commands %sh{
@@ -45,7 +45,7 @@ define-command orgmode-toggle-checkbox %{
   }
 }
 
-define-command orgmode-toggle-task-state %{
+def orgmode-toggle-task-state %{
   evaluate-commands %{
     execute-keys ',xs^(\*+\h+)(TODO|ACTIVE|DONE)?<ret>'
     evaluate-commands %sh{

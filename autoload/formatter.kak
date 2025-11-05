@@ -8,7 +8,7 @@ hook global BufSetOption filetype=nix %{ set-option buffer formatcmd "nixfmt -" 
 
 hook global BufSetOption filetype=ruby %{ set-option buffer formatlspserver rubocop }
 
-hook global BufSetOption filetype=(?:javascript|typescript) %{
+hook global BufSetOption filetype=(?:javascript|typescript|jsx|tsx) %{
   evaluate-commands %sh{
     if [ -f "$PWD/biome.json" ]; then
       echo "set-option buffer formatlspserver biome"

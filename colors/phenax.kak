@@ -19,9 +19,10 @@ evaluate-commands %sh{
   red="rgb:cc6666"
   orange="rgb:de935f"
   yellow="rgb:f0c674"
-  green="rgb:b3f6c0"
+  green1="rgb:b3f6c0"
+  green2="rgb:00b894"
   blue1="rgb:81a2be"
-  blue2="rgb:81dad9"
+  blue2="rgb:81cac9"
   blue3="rgb:82aaff"
   aqua="rgb:8abeb7"
   purple="rgb:b294bb"
@@ -31,31 +32,31 @@ evaluate-commands %sh{
   echo "
     face global value ${blue1}
     face global type ${blue1}
-    face global variable ${blue1}
+    face global variable white
+    face global const_variable white
     face global numeric ${orange}
     face global module ${blue1}
     face global function ${blue2}
-    face global string ${green}
-    face global keyword ${accent2}
+    face global string ${green1}
+    face global keyword ${accent1}
     face global operator ${aqua}
     face global attribute ${blue1}
     face global comment ${comment}
     face global documentation comment
     face global meta ${foreground}
     face global builtin ${yellow}
-    face global const_variable ${blue1}
   "
 
   ## markup
   echo "
     face global title ${blue1}
     face global header ${accent2}
-    face global mono ${green}
+    face global mono ${green1}
     face global block ${orange}
     face global link ${blue1}
     face global bullet ${red}
     face global list ${red}
-    face global inlineBold ${green}+b
+    face global inlineBold ${accent2}+b
     face global inlineItalic +i
     face global inlineStrikethrough ${foreground3}+fs
     face global inlineUnderline ${foreground}+fu
@@ -64,7 +65,7 @@ evaluate-commands %sh{
     face global header1 ${accent3}+b
     face global header2 ${accent1}+b
     face global header3 ${blue1}+b
-    face global header4 ${green}+b
+    face global header4 ${green1}+b
     face global header5 ${purple}+b
     face global header6 ${aqua}+b
     face global checkboxChecked ${foreground3}
@@ -72,7 +73,7 @@ evaluate-commands %sh{
     face global checkboxPending ${orange}
     face global checkboxTodo ${red}
     face global orgTaskStateTodo ${black},${red}+b
-    face global orgTaskStateDone ${black},${green}+b
+    face global orgTaskStateDone ${black},${green1}+b
     face global orgTaskStateActive ${black},${orange}+b
     face global markup_codeblock ${foreground2},${mildhighlight1}+a
     face global orgCodeBlock markup_codeblock
@@ -93,8 +94,8 @@ evaluate-commands %sh{
   echo "
     face global PrimaryCursor black,${foreground}+fg
     face global SecondaryCursor black,${foreground3}+fg
-    face global PrimaryCursorEol ${background},${green}
-    face global SecondaryCursorEol ${background},${green}
+    face global PrimaryCursorEol ${background},${green1}
+    face global SecondaryCursorEol ${background},${green1}
     face global InsertCursor black,${orange}+fg
   "
 
@@ -114,7 +115,7 @@ evaluate-commands %sh{
     face global StatusLine ${foreground},${background}
     face global StatusLineMode ${yellow}+b
     face global StatusLineInfo ${aqua},default
-    face global StatusLineValue ${green}
+    face global StatusLineValue ${green1}
     face global StatusCursor ${window},${aqua}
     face global Prompt ${accent1},${background}
     face global MatchingChar ${yellow},${background}+b

@@ -9,6 +9,12 @@ hook global KakBegin .* %{
   set-option global luar_interpreter luajit
 }
 
+# hook global BufCreate .*[.]tsx %{
+#   set-option buffer filetype tsx
+#   set-option buffer tree_sitter_lang tsx
+#   set-option buffer lsp_language_id typescriptreact
+# }
+
 colorscheme phenax
 set-option global autoreload yes
 set-option global incsearch true

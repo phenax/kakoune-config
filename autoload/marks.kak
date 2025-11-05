@@ -38,8 +38,8 @@ define-command marks-switch -params 1 %{
 }
 
 declare-user-mode marks
-map global user a ':enter-user-mode-with-count marks<ret>' -docstring 'Marks mode'
-map global user <space> ':marks-switch %val{count}<ret>' -docstring 'Switch marks'
-map global marks a ':marks-add %val{buffile} %opt{user_mode_count}<ret>' -docstring 'Create new mark from buffer'
-map global marks d ':marks-delete %val{buffile}<ret>' -docstring 'Delete mark'
-map global marks C ':marks-clear<ret>' -docstring 'Clear mark'
+map global user a ': enter-user-mode-with-count marks<ret>' -docstring 'Marks mode'
+map global user <space> ': marks-switch %val{count}<ret>' -docstring 'Switch marks'
+map global marks a ': marks-add %val{buffile} %opt{user_mode_count}<ret>' -docstring 'Create new mark from buffer'
+map global marks d ': marks-delete %val{buffile}<ret>' -docstring 'Delete mark'
+map global marks C ': marks-clear<ret>' -docstring 'Clear mark'
