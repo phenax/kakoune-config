@@ -57,7 +57,7 @@ evaluate-commands %sh{
     face global bullet ${red}
     face global list ${red}
     face global inlineBold ${accent2}+b
-    face global inlineItalic +i
+    face global inlineItalic default
     face global inlineStrikethrough ${foreground3}+fs
     face global inlineUnderline ${foreground}+fu
     face global inlineCode ${foreground2},${mildhighlight2}+a
@@ -87,6 +87,8 @@ evaluate-commands %sh{
     face global RowLine default,rgb:101010
     face global WrapLine default,rgb:101010
     face global StatusLineBufname ${accent1},default+b
+    face global StatusLineDetails ${foreground2}
+    face global StatusLineExtras ${foreground4}
     face global WrapLine default,rgb:101010
   "
 

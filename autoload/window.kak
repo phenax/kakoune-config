@@ -7,7 +7,17 @@ map global win s ': tmux-terminal-horizontal kak -c %val{session}<ret>' -docstri
 map global win v ': tmux-terminal-vertical kak -c %val{session}<ret>' -docstring 'Split horizontal'
 map global win z ': wq<ret>'
 
-define-command terminal-singleton -params 2.. -docstring 'terminal-singleton <name> <command> [args...]' %{
+def toolsclient %{
+  rename-client main
+  set global jumpclient main
+
+  try %{ eval -client tools nop } catch %{
+    tmux-terminal-vertical kak -c %val{session} -e 'rename-client tools'
+    set global toolsclient tools
+  }
+}
+
+def terminal-singleton -params 2.. -docstring 'terminal-singleton <name> <command> [args...]' %{
   eval %sh{
     name="$1"; shift 1;
 

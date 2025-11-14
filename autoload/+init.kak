@@ -24,24 +24,29 @@ set-option -add global path "**"
 set-option global startup_info_version 20250603
 set-option global scrolloff 10,3
 set-option -add global ui_options terminal_enable_mouse=false terminal_set_title=true
+
+# Modeline
+# declare-option -hidden _lsp_modeline_diagnostics "%opt{lsp_diagnostic_error_count}"
+# %opt{lsp_modeline_breadcrumbs}
 set-option global modelinefmt \
-'%opt{lsp_modeline_progress} {StatusLineDetails}{{context_info}} {{mode_info}}
+'{StatusLineExtras}%opt{lsp_modeline_progress}
+{StatusLineDetails}{{context_info}} {{mode_info}}
 %val{cursor_line}/%val{buf_line_count}:%val{cursor_char_column}
 {StatusLineBufname}%sh{echo "$kak_bufname" | awk -F/ "{if (NF >= 2) {print \$(NF-1) \"/\" \$NF} else {print \$NF}}"}'
 
 # Highlighters
 add-highlighter global/ number-lines -relative -hlcursor -min-digits 3 -separator ' '
-add-highlighter global/ column '%opt{autowrap_column}' WrapLine
 add-highlighter global/ column '%val{cursor_char_column}' ColumnLine
 add-highlighter global/ line '%val{cursor_line}' RowLine
 add-highlighter global/ regex \h+$ 0:Error # Highlight trailing whitespaces
-add-highlighter global/ wrap -word -indent # Softwrap long lines
 add-highlighter global/ show-matching -previous
 add-highlighter global/ show-whitespaces -spc ' ' -tab '│' -lf '¬' -indent '│'
 hook global RegisterModified '/' %{
-  # Highlight current searchterm
+  # @todo: Highlight current searchterm
+  # TODO: Highlight current searchterm
   add-highlighter -override global/search regex "%reg{/}" 0:search
 }
+add-highlighter global/ regex \b(TODO|FIXME|@todo|@fixme)\b 0:default+rb
 
 # Misc keys
 map global user '<esc>' ': set-register slash ""<ret>' -docstring 'Clear search highlighting'
@@ -62,6 +67,17 @@ map global system d ': buffer *debug*<ret>' -docstring 'Switch to debug buffer'
 map global system f ':set buffer filetype ' -docstring 'Set filetype'
 map global system m ':set buffer makecmd ""<left>' -docstring 'Set compile command'
 map global system p ': info %val{buffile}<ret>' -docstring 'Print file path'
+
+# Wrapping
+set-option global autowrap_column 100
+hook global WinSetOption filetype=git-commit %{
+  set window autowrap_column 72
+  autowrap-enable
+}
+add-highlighter global/ column '%opt{autowrap_column}' WrapLine
+add-highlighter global/ wrap -word -indent # Softwrap long lines
+map global normal = '|fmt -w $kak_opt_autowrap_column<ret>' -docstring 'Wrap text with fmt'
+
 
 # Preserve count for user modes (look for alternatives)
 # TODO: Reset count on modechange?
@@ -89,5 +105,5 @@ map global ai ! '!ai ""<left>' -docstring 'Insert output'
 map global ai | '|ai ""<left>' -docstring 'Replace output'
 
 # Editorconfig
-hook global BufOpenFile .* %{ try %{ editorconfig-load } }
-hook global BufNewFile .* %{ try %{ editorconfig-load } }
+hook global WinCreate ^[^*]+$ %{editorconfig-load}
+
