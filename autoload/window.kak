@@ -6,6 +6,7 @@ map global win <c-q> ': quit<ret>' -docstring 'Quit'
 map global win s ': tmux-terminal-horizontal kak -c %val{session}<ret>' -docstring 'Split vertical'
 map global win v ': tmux-terminal-vertical kak -c %val{session}<ret>' -docstring 'Split horizontal'
 map global win z ': wq<ret>'
+map global win t ': toolsclient<ret>'
 
 def toolsclient %{
   rename-client main

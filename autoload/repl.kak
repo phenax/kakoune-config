@@ -14,6 +14,8 @@ declare-option bool xrepl_running false;
 declare-option str xrepl_current_name;
 declare-option str xrepl_current_cmd;
 declare-option str xrepl_current_transform;
+declare-option str xrepl_current_split_size;
+declare-option bool xrepl_current_split_vertical false;
 declare-option bool xrepl_current_clear_screen false;
 
 # TODO: Use register set to selection (paragraph) instead of selection
@@ -24,17 +26,17 @@ declare-option bool xrepl_current_clear_screen false;
 
 declare-user-mode repl-mode-select
 define-command define-repl-mode -params 4 %{
-  # TODO: USe a hidden command and use for keymap
+  # TODO: Use a hidden command and use for keymap
   map %arg{1} repl-mode-select %arg{2} -docstring %arg{3} %sh{
     kak_escape() { printf "'"; printf '%s' "$1" | sed "s/'/''/g"; printf "'"; }
     printf ": xrepl-quit<ret>"
     printf ": set global xrepl_current_name '$3'<ret>"
     printf ": set global xrepl_current_cmd \"\$SHELL\"<ret>"
     printf ": set global xrepl_current_transform \"\"<ret>"
+    printf ": set global xrepl_current_split_size 45%%<ret>"
+    printf ": set global xrepl_current_split_vertical false<ret>"
     printf ": set global xrepl_current_clear_screen false<ret>"
     printf ": evaluate-commands $(kak_escape "$(echo "$4" | tr '\n' ';')")<ret>"
-    # echo "$4" >> foobarity
-    # echo "$(kak_escape "$(echo "$4" | tr '\n' ';')")" >> foobarity
     printf ": xrepl-begin<ret>"
   }
 }
@@ -66,7 +68,18 @@ hook global BufSetOption filetype=ruby %{
   }
 }
 
+hook global BufSetOption filetype=clojure %{
+  # TODO: Just temporary for messing around. Remove module name
+  map buffer repl r ': repl-send-text %{(require ''[pluribus.core :as p] :reload)}; xrepl-send-keys Enter<ret>' -docstring 'Cljs reload'
+  define-repl-mode buffer j 'Clojurescript repl' %{
+    set global xrepl_current_cmd 'clj -M -m cljs.main --repl-opts "{:launch-browser false}" --compile pluribus.core --repl'
+    set global xrepl_current_split_size 30%%
+    set global xrepl_current_split_vertical true
+  }
+}
+
 hook global BufSetOption filetype=(?:javascript|typescript|jsx|tsx) %{
+  # TODO: Search for root cypress config file and cd into it
   define-repl-mode buffer c 'Cypress' %{
     set global xrepl_current_cmd '$SHELL'
     set global xrepl_current_transform 'cat > /dev/null
@@ -128,7 +141,8 @@ define-command xrepl-begin %{
       if [ -z "$init_cmd" ]; then init_cmd="$SHELL"; fi
       echo "info %opt{xrepl_current_name}"
       echo "set-option global xrepl_running true"
-      echo "repl-new -l 45% $init_cmd"
+      cmd=$([ "$kak_opt_xrepl_current_split_vertical" == "true" ] && echo "tmux-repl-vertical" || echo "tmux-repl-horizontal")
+      echo "$cmd -l $kak_opt_xrepl_current_split_size $init_cmd"
       echo "nop %sh{ tmux last-pane }"
     fi
   }

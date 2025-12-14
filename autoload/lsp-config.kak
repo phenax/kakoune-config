@@ -87,6 +87,17 @@ hook -group lsp-filetype-haskell global BufSetOption filetype=haskell %{
   }
 }
 
+hook global BufCreate .*[.]ua %{ set-option buffer filetype uiua }
+hook global BufSetOption filetype=uiua %{
+  set-option buffer lsp_servers %{
+    [uiua]
+    args = [ "lsp" ]
+    root_globs = [ "main.ua", ".fmt.ua", ".git" ]
+  }
+  # Auto-formatter for uiua (TODO: Move to formatter.kak)
+  hook buffer BufWritePre .* %{ lsp-formatting-sync }
+}
+
 hook global WinSetOption filetype=.* %{
   hook window -group semantic-tokens BufReload .* lsp-semantic-tokens
   hook window -group semantic-tokens NormalIdle .* lsp-semantic-tokens
