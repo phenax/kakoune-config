@@ -1,3 +1,0 @@
-[submodule "autoload/luar"]
-	path = autoload/luar
-	url = git@github.com:gustavo-hms/luar.git

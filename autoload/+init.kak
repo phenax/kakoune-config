@@ -4,11 +4,6 @@ nop %sh{ ln -sf "$kak_runtime/rc" "$kak_config/autoload/standard-library" 2>/dev
 eval %sh{kak-tree-sitter -dksvv --init "${kak_session}" --with-highlighting --with-text-objects}
 eval %sh{kcr init kakoune}
 
-hook global KakBegin .* %{
-  require-module luar
-  set-option global luar_interpreter luajit
-}
-
 # hook global BufCreate .*[.]tsx %{
 #   set-option buffer filetype tsx
 #   set-option buffer tree_sitter_lang tsx
