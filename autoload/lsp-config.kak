@@ -16,6 +16,7 @@ lsp-enable
 lsp-inlay-diagnostics-enable global
 
 map global user l ': enter-user-mode lsp<ret>' -docstring 'LSP mode'
+map global lsp t ': lsp-type-definition<ret>' -docstring 'LSP type definition'
 # map global user t ':enter-user-mode tree-sitter<ret>' -docstring 'Treesitter mode'
 map global object f '<a-semicolon>lsp-object Function Method<ret>' -docstring 'LSP function or method'
 map global object t '<a-semicolon>lsp-object Class Interface Struct<ret>' -docstring 'LSP class interface or struct'

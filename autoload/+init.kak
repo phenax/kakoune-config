@@ -1,5 +1,16 @@
 # Link builtin autoloads
-nop %sh{ ln -sf "$kak_runtime/rc" "$kak_config/autoload/standard-library" 2>/dev/null || true }
+nop %sh{
+  ln -sf "$kak_runtime/rc" "$kak_config/autoload/standard-library" 2>/dev/null || true
+  # rm -rf "$kak_config/autoload/stdlib" 2>/dev/null || true
+  # mkdir -p "$kak_config/autoload/stdlib" || true
+  # ln -sf "$kak_runtime/rc/detection" "$kak_config/autoload/stdlib/detection" 2>/dev/null || true
+  # ln -sf "$kak_runtime/rc/filetype" "$kak_config/autoload/stdlib/filetype" 2>/dev/null || true
+  # ln -sf "$kak_runtime/rc/tools" "$kak_config/autoload/stdlib/tools" 2>/dev/null || true
+  # ln -sf "$kak_runtime/rc/windowing" "$kak_config/autoload/stdlib/windowing" 2>/dev/null || true
+}
+
+# Disable indent trimming
+set-option global disabled_hooks .*-trim-indent
 
 eval %sh{kak-tree-sitter -dksvv --init "${kak_session}" --with-highlighting --with-text-objects}
 eval %sh{kcr init kakoune}
@@ -19,6 +30,7 @@ set-option -add global path "**"
 set-option global startup_info_version 20250603
 set-option global scrolloff 10,3
 set-option -add global ui_options terminal_enable_mouse=false terminal_set_title=true
+# terminal_status_on_top=true
 
 # Modeline
 # declare-option -hidden _lsp_modeline_diagnostics "%opt{lsp_diagnostic_error_count}"
