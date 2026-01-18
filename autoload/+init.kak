@@ -1,12 +1,9 @@
 # Link builtin autoloads
 nop %sh{
+  rm -f "$kak_config/autoload/standard-library" || true
+  rm -f "$kak_config/autoload/plugins" || true
   ln -sf "$kak_runtime/rc" "$kak_config/autoload/standard-library" 2>/dev/null || true
-  # rm -rf "$kak_config/autoload/stdlib" 2>/dev/null || true
-  # mkdir -p "$kak_config/autoload/stdlib" || true
-  # ln -sf "$kak_runtime/rc/detection" "$kak_config/autoload/stdlib/detection" 2>/dev/null || true
-  # ln -sf "$kak_runtime/rc/filetype" "$kak_config/autoload/stdlib/filetype" 2>/dev/null || true
-  # ln -sf "$kak_runtime/rc/tools" "$kak_config/autoload/stdlib/tools" 2>/dev/null || true
-  # ln -sf "$kak_runtime/rc/windowing" "$kak_config/autoload/stdlib/windowing" 2>/dev/null || true
+  ln -sf "$kak_runtime/autoload/plugins" "$kak_config/autoload/plugins" 2>/dev/null || true
 }
 
 # Disable indent trimming
@@ -14,12 +11,6 @@ set-option global disabled_hooks .*-trim-indent
 
 eval %sh{kak-tree-sitter -dksvv --init "${kak_session}" --with-highlighting --with-text-objects}
 eval %sh{kcr init kakoune}
-
-# hook global BufCreate .*[.]tsx %{
-#   set-option buffer filetype tsx
-#   set-option buffer tree_sitter_lang tsx
-#   set-option buffer lsp_language_id typescriptreact
-# }
 
 colorscheme phenax
 set-option global autoreload yes
@@ -49,11 +40,11 @@ add-highlighter global/ regex \h+$ 0:Error # Highlight trailing whitespaces
 add-highlighter global/ show-matching -previous
 add-highlighter global/ show-whitespaces -spc ' ' -tab '│' -lf '¬' -indent '│'
 hook global RegisterModified '/' %{
-  # @todo: Highlight current searchterm
-  # TODO: Highlight current searchterm
+  # Highlight search
   add-highlighter -override global/search regex "%reg{/}" 0:search
 }
-add-highlighter global/ regex \b(TODO|FIXME|@todo|@fixme)\b 0:default+rb
+add-highlighter global/ regex \b(TODO|FIXME)\b 0:default+rb
+add-highlighter global/ regex @(todo|fixme) 0:default+rb
 
 # Misc keys
 map global user '<esc>' ': set-register slash ""<ret>' -docstring 'Clear search highlighting'
@@ -64,16 +55,18 @@ map global normal <c-j> 15j -docstring '15 down'
 map global normal <c-k> 15k -docstring '15 up'
 
 map global user y "<a-|> xclip -selection clipboard<ret>" -docstring "yank the selection into the clipboard"
-map global user p "<a-!> xclip -selection clipboard -o<ret>" -docstring "paste the clipboard"
 
 declare-user-mode system
 map global user q ': enter-user-mode system<ret>' -docstring 'System mode'
-map global system o ':echo %opt{}<left>' -docstring 'Print opt'
-map global system v ':echo %val{}<left>' -docstring 'Print value'
+map global system o ':info %opt{}<left>' -docstring 'Print opt'
+map global system v ':info %val{}<left>' -docstring 'Print value'
 map global system d ': buffer *debug*<ret>' -docstring 'Switch to debug buffer'
 map global system f ':set buffer filetype ' -docstring 'Set filetype'
-map global system m ':set buffer makecmd ""<left>' -docstring 'Set compile command'
+map global system M ':set buffer makecmd ""<left>' -docstring 'Set compile command'
+map global system m ': make<ret>' -docstring 'Compile'
 map global system p ': info %val{buffile}<ret>' -docstring 'Print file path'
+map global system ! ':info %sh{}<left>' -docstring 'Run command'
+map global system t ': terminal %sh{ echo "$SHELL" }<ret>' -docstring 'Open new term'
 
 # Wrapping
 set-option global autowrap_column 100
@@ -112,5 +105,5 @@ map global ai ! '!ai ""<left>' -docstring 'Insert output'
 map global ai | '|ai ""<left>' -docstring 'Replace output'
 
 # Editorconfig
-hook global WinCreate ^[^*]+$ %{editorconfig-load}
+hook global WinCreate ^[^*]+$ %{ editorconfig-load }
 

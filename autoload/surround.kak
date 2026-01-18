@@ -1,22 +1,24 @@
-# declare-user-mode surround
-# declare-user-mode surround-append
-# declare-user-mode surround-delete
-# map global user k ': enter-user-mode surround<ret>'
-# map global surround a ': enter-user-mode surround-append<ret>'
-# map global surround d ': enter-user-mode surround-delete<ret>'
+declare-user-mode surround
+declare-user-mode surround-append
+declare-user-mode surround-delete
+declare-user-mode surround-select
+map global user k ': enter-user-mode surround<ret>'
+map global surround a ': enter-user-mode surround-append<ret>'
+map global surround s ': enter-user-mode surround-select<ret>'
 
-# define-command define-surround -params 4 -docstring ': <trigger> <surrounddesc> <start> <end>' %{
-#   map global surround-append %arg{1} %sh{ echo "i${3}<esc>a${4}" }
-#   map global surround-delete %arg{1} %sh{ echo "<a-a>${2}<a-S>d," }
-# }
+define-command define-surround -params 4 -docstring ': <trigger> <surrounddesc> <start> <end>' %{
+  map global surround-append %arg{1} %sh{ echo "i${3}<esc>a${4}" }
+  map global surround-delete %arg{1} %sh{ echo "<a-a>${2}<a-S>d," }
+  map global surround-select %arg{1} %sh{ echo "<a-a>${2}<a-S>" }
+}
 
-# define-surround '(' '(' '(' ')'
-# define-surround '[' '[' '[' ']'
-# define-surround '{' '{' '{' '}'
-# define-surround '`' '`' '`' '`'
-# define-surround '"' '"' '"' '"'
-# define-surround "'" "'" "'" "'"
-# define-surround t "c<lt>div,<lt>/div<gt><ret>" "<lt>div<gt>" "<lt>/div<gt>"
+define-surround '(' '(' '(' ')'
+define-surround '[' '[' '[' ']'
+define-surround '{' '{' '{' '}'
+define-surround '`' '`' '`' '`'
+define-surround '"' '"' '"' '"'
+define-surround "'" "'" "'" "'"
+define-surround t "c<lt>div,<lt>/div<gt><ret>" "<lt>div<gt>" "<lt>/div<gt>"
 
 
 # declare-option range-specs ghost_completion;

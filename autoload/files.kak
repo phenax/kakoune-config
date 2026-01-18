@@ -7,14 +7,14 @@ def file-manager -params .. %{
 }
 
 def findfzf %{
-  terminal-singleton fzf sh -c 'kcr edit $(fd -t f --hidden --color=never -E .git | fzf --multi --min-height=100 --preview=''bat --color=always {}'')'
+  terminal-singleton fzf sh -c 'kcr edit $(fd -t f --hidden --color=never -E .git | fzf --prompt='':find '' --multi --min-height=100 --preview=''bat --color=always {}'')'
 }
 
 declare-user-mode file
 map global user f ': enter-user-mode file<ret>' -docstring 'File mode'
-map global file f ': find ' -docstring 'Find files'
+map global file F ': find ' -docstring 'Find files'
 map global file n ': file-manager %val{buffile}<ret>' -docstring 'File manager'
-map global file F ': findfzf<ret>' -docstring 'Fzf'
+map global file f ': findfzf<ret>' -docstring 'Fzf'
 
 declare-user-mode buffer
 map global user b ': enter-user-mode-with-count buffer<ret>' -docstring 'Buffer mode'

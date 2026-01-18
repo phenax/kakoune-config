@@ -6,6 +6,8 @@ define-command gitui -params .. %{
     gitu %arg{@}
 }
 
+# TODO: Script to open git remote url (github/srht/gitlab/etc)
+
 declare-user-mode git
 declare-user-mode git-r
 map global user g ': enter-user-mode git<ret>' -docstring 'Git mode'

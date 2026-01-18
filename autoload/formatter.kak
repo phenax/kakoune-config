@@ -17,8 +17,15 @@ hook global BufSetOption filetype=(?:javascript|typescript|jsx|tsx) %{
     fi
   }
 }
-define-command biome -docstring 'Format file on disk using biome' %{
-  nop %sh{ npx biome check --fix --stdin-file-path=$kak_buffile }
+
+define-command biome-buffer -docstring 'Format buffer file on disk using biome' %{
+  biome %val{buffile}
+}
+
+define-command biome -params .. -docstring 'Format project using biome' %{
+  info %sh{
+    npx biome check --fix "$@" && echo "Success" || echo "Failed"
+  }
 }
 
 define-command apply-formatting -docstring 'Apply formatting with formatcmd or lsp' %{
