@@ -11,6 +11,7 @@ map global repl p ': xrepl-send-prompt<ret>' -docstring 'Prompt for text to send
 map global repl q ': xrepl-quit<ret>' -docstring 'Quit repl'
 
 declare-option bool xrepl_running false;
+# declare-option int xrepl_tmux_repl_id;
 declare-option str xrepl_current_name;
 declare-option str xrepl_current_cmd;
 declare-option str xrepl_current_transform;

@@ -1,8 +1,8 @@
 # Link builtin autoloads
 nop %sh{
   rm -f "$kak_config/autoload/standard-library" || true
-  rm -f "$kak_config/autoload/plugins" || true
   ln -sf "$kak_runtime/rc" "$kak_config/autoload/standard-library" 2>/dev/null || true
+  rm -f "$kak_config/autoload/plugins" || true
   ln -sf "$kak_runtime/autoload/plugins" "$kak_config/autoload/plugins" 2>/dev/null || true
 }
 
@@ -11,6 +11,12 @@ set-option global disabled_hooks .*-trim-indent
 
 eval %sh{kak-tree-sitter -dksvv --init "${kak_session}" --with-highlighting --with-text-objects}
 eval %sh{kcr init kakoune}
+
+# hook global BufCreate .*[.]tsx %{
+#   set-option buffer filetype tsx
+#   set-option buffer tree_sitter_lang tsx
+#   set-option buffer lsp_language_id typescriptreact
+# }
 
 colorscheme phenax
 set-option global autoreload yes
@@ -32,8 +38,27 @@ set-option global modelinefmt \
 %val{cursor_line}/%val{buf_line_count}:%val{cursor_char_column}
 {StatusLineBufname}%sh{echo "$kak_bufname" | awk -F/ "{if (NF >= 2) {print \$(NF-1) \"/\" \$NF} else {print \$NF}}"}'
 
+# declare-option line-specs relative_markers
+# define-command -hidden update_relative_markers %{
+#   evaluate-commands %sh{
+#     indicators=14
+#     line_specs=$(seq $(($indicators + 1)) | while IFS= read n; do
+#       diff=$(echo "($n - ($indicators/2) - 1) * 5" | bc)
+#       line=$(echo "$kak_cursor_line + $diff" | bc)
+#       if [ "$line" -gt 0 ] && [ ! "$line" = "$kak_cursor_line" ]; then
+#         echo -e "$line|{gray}$diff"
+#       fi
+#     done);
+#     echo "set-option window relative_markers %val{timestamp} $(printf ' %s' $line_specs)"
+#   }
+# }
+# hook global WinCreate .* %{
+#   hook window NormalIdle .* %{ update_relative_markers }
+# }
+# add-highlighter global/ flag-lines blue relative_markers
+
 # Highlighters
-add-highlighter global/ number-lines -relative -hlcursor -min-digits 3 -separator ' '
+add-highlighter global/ number-lines -hlcursor -min-digits 3 -separator ' ' # -relative
 add-highlighter global/ column '%val{cursor_char_column}' ColumnLine
 add-highlighter global/ line '%val{cursor_line}' RowLine
 add-highlighter global/ regex \h+$ 0:Error # Highlight trailing whitespaces
@@ -64,7 +89,8 @@ map global system d ': buffer *debug*<ret>' -docstring 'Switch to debug buffer'
 map global system f ':set buffer filetype ' -docstring 'Set filetype'
 map global system M ':set buffer makecmd ""<left>' -docstring 'Set compile command'
 map global system m ': make<ret>' -docstring 'Compile'
-map global system p ': info %val{buffile}<ret>' -docstring 'Print file path'
+map global system p ': info %sh{ realpath -s --relative-to="$PWD" "$kak_buffile" }<ret>' -docstring 'Print relative file path'
+map global system P ': info %val{buffile}<ret>' -docstring 'Print absolute file path'
 map global system ! ':info %sh{}<left>' -docstring 'Run command'
 map global system t ': terminal %sh{ echo "$SHELL" }<ret>' -docstring 'Open new term'
 

@@ -15,7 +15,7 @@ evaluate-commands %sh{
   menu="rgb:101414"
   mildhighlight1="rgb:101414"
   mildhighlight2="rgb:202424"
-  comment="rgb:434545"
+  comment="rgb:636565"
   red="rgb:cc6666"
   orange="rgb:de935f"
   yellow="rgb:f0c674"
@@ -175,7 +175,7 @@ evaluate-commands %sh{
     face global InfoDiagnosticWarning     ${orange},default
     face global InfoDiagnosticHint        ${purple},default
     face global InfoDiagnosticInformation ${purple},default
-    face global DiagnosticError ${red}+uf
+    face global DiagnosticError default+u
     face global DiagnosticWarning ${yellow}+uf
     face global DiagnosticInfo ${purple}+f
     face global DiagnosticHint ${purple}+f

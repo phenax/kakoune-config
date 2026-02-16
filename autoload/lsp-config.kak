@@ -56,7 +56,7 @@ hook global BufSetOption filetype=(?:javascript|typescript|tsx|jsx) %{
 hook global BufSetOption filetype=(?:c|cpp|objc) %{
   set-option buffer lsp_servers %{
     [clangd]
-    args = [ "--log=info", "--clang-tidy" ]
+    args = [ "--log=verbose", "--clang-tidy" ]
     root_globs = ["compile_commands.json", ".clangd", ".git"]
   }
 }
