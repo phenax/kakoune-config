@@ -1,6 +1,7 @@
 hook global BufSetOption filetype=(?:javascript|typescript|jsx|tsx) %{
   define-snippet buffer snip-react-component
   define-snippet buffer snip-react-usestate
+  define-snippet buffer snip-function
 }
 
 define-command snip-react-usestate %{
@@ -22,6 +23,14 @@ define-command snip-react-component %{
     execute-keys "<esc>,itype %val{text}Prop = {<ret>}<ret><ret>"
     execute-keys "<esc>,iexport const %val{text} = ({  }: %val{text}Prop) => {<ret>"
     execute-keys "  return <lt>div><lt>/div>;"
+    execute-keys "<ret>};<esc>kwlt;"
+  }
+}
+
+define-command snip-function %{
+  prompt 'Name: ' %{
+    execute-keys "<esc>,iconst %val{text} = () => {<ret>"
+    execute-keys "  return 0;"
     execute-keys "<ret>};<esc>kwlt;"
   }
 }
