@@ -58,7 +58,7 @@ set-option global modelinefmt \
 # add-highlighter global/ flag-lines blue relative_markers
 
 # Highlighters
-add-highlighter global/ number-lines -hlcursor -min-digits 3 -separator ' ' # -relative
+add-highlighter global/ number-lines -hlcursor -min-digits 3 -separator ' ' -relative
 add-highlighter global/ column '%val{cursor_char_column}' ColumnLine
 add-highlighter global/ line '%val{cursor_line}' RowLine
 add-highlighter global/ regex \h+$ 0:Error # Highlight trailing whitespaces

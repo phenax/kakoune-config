@@ -34,5 +34,5 @@ define-command git-toggle-diff %{
 
 define-command git-line-blame %{
   terminal-singleton git-blame sh -c \
-    "git -p log -u -L '%sh{echo ""$kak_selection_desc"" | sed -E 's/\.[0-9]+//g'}:%val{buffile}' --color=always"
+    "git -p log -u -L '%sh{echo ""$kak_selection_desc"" | sed -E 's/\.[0-9]+//g'}:%val{buffile}' --color=always | delta"
 }
