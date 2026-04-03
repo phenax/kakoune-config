@@ -1,6 +1,8 @@
 # kakoune-config
 My kakoune configuration
 
+
+
 ## Tools
 - [tmux](https://github.com/tmux/tmux): Window management
 - [daffm](https://github.com/phenax/daffm): File manager
