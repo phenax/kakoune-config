@@ -1,14 +1,10 @@
 set-option global makecmd 'echo "Build command not set"; exit 1'
 
-# TODO: For some reason <ret> doesnt jump to error
-hook global BufSetOption filetype=(?:typescript|javascript|jsx|tsx) %{
-  set-option buffer makecmd "%val{config}/scripts/tsc-vimgrep.sh"
-}
+define-command makecmd-set-tsc %{ set-option buffer makecmd "%val{config}/scripts/tsc-vimgrep.sh" }
+define-command makecmd-set-cabal %{ set-option buffer makecmd "cabal build" }
+define-command makecmd-set-cargo %{ set-option buffer makecmd "cargo build" }
 
-hook global BufSetOption filetype=haskell %{ set-option buffer makecmd "cabal build" }
-
-hook global BufSetOption filetype=rust %{ set-option buffer makecmd "cargo build" }
-
+# Overriding the make command
 provide-module make-override %{
   define-command -params .. -override -docstring %{
     make [<arguments>]: make utility wrapper

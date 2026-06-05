@@ -9,14 +9,9 @@ nop %sh{
 # Disable indent trimming
 set-option global disabled_hooks .*-trim-indent
 
-eval %sh{kak-tree-sitter -dksvv --init "${kak_session}" --with-highlighting --with-text-objects}
+# Disabled treesitter because eh
+# eval %sh{kak-tree-sitter -dksvv --init "${kak_session}" --with-highlighting --with-text-objects}
 eval %sh{kcr init kakoune}
-
-# hook global BufCreate .*[.]tsx %{
-#   set-option buffer filetype tsx
-#   set-option buffer tree_sitter_lang tsx
-#   set-option buffer lsp_language_id typescriptreact
-# }
 
 colorscheme phenax
 set-option global autoreload yes
@@ -87,7 +82,7 @@ map global system o ':info %opt{}<left>' -docstring 'Print opt'
 map global system v ':info %val{}<left>' -docstring 'Print value'
 map global system d ': buffer *debug*<ret>' -docstring 'Switch to debug buffer'
 map global system f ':set buffer filetype ' -docstring 'Set filetype'
-map global system M ':set buffer makecmd ""<left>' -docstring 'Set compile command'
+map global system M ':set global makecmd ""<left>' -docstring 'Set global compile command'
 map global system m ': make<ret>' -docstring 'Compile'
 map global system p ': info %sh{ realpath -s --relative-to="$PWD" "$kak_buffile" }<ret>' -docstring 'Print relative file path'
 map global system P ': info %val{buffile}<ret>' -docstring 'Print absolute file path'
