@@ -10,10 +10,15 @@ define-command gitui -params .. %{
 
 declare-user-mode git
 declare-user-mode git-r
+declare-user-mode git-d
 map global user g ': enter-user-mode git<ret>' -docstring 'Git mode'
 map global git s ': gitui<ret>' -docstring 'Git tui'
 map global git A ': git add %val{buffile}<ret>' -docstring 'Add file'
 map global git m ': git-line-blame<ret>' -docstring 'Blame selection lines'
+
+map global git d ': enter-user-mode git-d<ret>' -docstring 'Diff mode'
+map global git-d d ': git-open-diff<ret>' -docstring 'Open staged files'
+map global git-d c ': git-open-commit<ret>' -docstring 'Open files changed in last commit'
 
 map global git r ': enter-user-mode git-r<ret>' -docstring 'Git re(base/set) mode'
 map global git-r f ': git reset HEAD^1 -- %val{buffile}<ret>' -docstring 'Split file out of last commit'
@@ -35,4 +40,11 @@ define-command git-toggle-diff %{
 define-command git-line-blame %{
   terminal-singleton git-blame sh -c \
     "git -p log -u -L '%sh{echo ""$kak_selection_desc"" | sed -E 's/\.[0-9]+//g'}:%val{buffile}' --color=always | delta"
+}
+
+define-command git-open-diff -params 0..1 %{
+  eval %sh{ git diff --name-only "${1:-HEAD}" | sed 's/^/edit /' }
+}
+define-command git-open-commit -params 0..1 %{
+  eval %sh{ git show --name-only --pretty="" "$@" | sed 's/^/edit /' }
 }
