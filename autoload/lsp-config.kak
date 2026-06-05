@@ -1,4 +1,5 @@
 eval %sh{kak-lsp}
+
 # Disable default server configs
 remove-hooks global lsp-filetype-javascript
 remove-hooks global lsp-filetype-c-family

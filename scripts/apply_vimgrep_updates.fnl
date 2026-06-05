@@ -28,7 +28,7 @@
   (when (and (> (length lines) linenr) (not= (. lines linenr) text))
     (set (. lines linenr) text)
     (local file (io.open filepath :w))
-    (file:write (table.concat lines "\n"))
+    (file:write (.. (table.concat lines "\n") "\n"))
     (file:close)
     (set written? true))
   written?)
