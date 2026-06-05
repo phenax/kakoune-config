@@ -41,10 +41,22 @@ define-command marks-edit-all %{
   edit %sh{ "$kak_config/scripts/marks.fnl" show-path }
 }
 
+define-command marks-add-all-buffers %{
+  eval %sh{
+    echo "$kak_quoted_buflist" | xargs -n1 | while IFS= read file; do
+      if [ -f "$file" ]; then
+        "$kak_config/scripts/marks.fnl" add "$(realpath "$file")"
+      fi
+    done
+  }
+  marks-show
+}
+
 declare-user-mode marks
 map global user a ': enter-user-mode-with-count marks<ret>' -docstring 'Marks mode'
 map global user <space> ': marks-select %val{count}<ret>' -docstring 'Select marks'
 map global marks a ': marks-add %val{buffile} %opt{user_mode_count}<ret>' -docstring 'Create new mark from buffer'
+map global marks A ': marks-add-all-buffers<ret>' -docstring 'Load all buffer files as marks'
 map global marks d ': marks-delete %val{buffile}<ret>' -docstring 'Delete mark'
 map global marks C ': marks-clear<ret>' -docstring 'Clear mark'
 map global marks e ': marks-edit-all<ret>' -docstring 'Open buffer to edit marks'
