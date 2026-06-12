@@ -6,26 +6,16 @@ hook global BufSetOption filetype=fennel %{ set-option buffer formatcmd "fnlfmt 
 
 hook global BufSetOption filetype=nix %{ set-option buffer formatcmd "nixfmt -" }
 
-hook global BufSetOption filetype=ruby %{ set-option buffer formatlspserver rubocop }
+hook global BufSetOption filetype=ruby %{
+  set-option buffer formatcmd "bundle exec rubocop -a --stderr --stdin '%val{buffile}'"
+}
 
 hook global BufSetOption filetype=(?:javascript|typescript|jsx|tsx) %{
-  evaluate-commands %sh{
-    if [ -f "$PWD/biome.json" ]; then
-      echo "set-option buffer formatlspserver biome"
-    else
-      echo "set-option buffer formatlspserver typescript-language-server"
-    fi
-  }
+  set-option buffer formatcmd "biome format --stdin-file-path='%val{buffile}'"
 }
 
-define-command biome-buffer -docstring 'Format buffer file on disk using biome' %{
-  biome %val{buffile}
-}
-
-define-command biome -params .. -docstring 'Format project using biome' %{
-  info %sh{
-    npx biome check --fix "$@" && echo "Success" || echo "Failed"
-  }
+hook global BufSetOption filetype=(?:c|cpp) %{
+  set-option buffer formatcmd "clang-format --assume-filename='%val{buffile}'"
 }
 
 define-command apply-formatting -docstring 'Apply formatting with formatcmd or lsp' %{
@@ -38,4 +28,8 @@ define-command apply-formatting -docstring 'Apply formatting with formatcmd or l
       echo lsp-formatting-sync
     fi
   }
+}
+
+define-command biome -params .. -docstring 'Format project using biome' %{
+  info %sh{ npx biome check --fix "$@" && echo "Success" || echo "Failed" }
 }

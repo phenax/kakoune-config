@@ -3,6 +3,8 @@ hook global BufSetOption filetype=org %{
   map buffer normal <ret> ': orgmode-jump-link<ret>' -docstring 'Jump to link'
   map buffer user o ': enter-user-mode org<ret>' -docstring 'Org mode'
   map buffer org <tab> ': orgmode-toggle<ret>' -docstring 'Toggle checkbox/task'
+  map buffer org t ': orgmode-new-task<ret>' -docstring 'New task item'
+  map buffer org T ': orgmode-new-todo<ret>' -docstring 'New todo item'
 }
 
 def orgmode-toggle %{
@@ -29,6 +31,10 @@ def orgmode-jump-link %{
     }
   } }
 }
+
+def orgmode-new-task %{ execute-keys '<esc>o- [ ] ' }
+
+def orgmode-new-todo %{ execute-keys '<esc>o** TODO ' }
 
 def orgmode-toggle-checkbox %{
   evaluate-commands %{

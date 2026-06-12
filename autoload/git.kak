@@ -15,6 +15,7 @@ map global user g ': enter-user-mode git<ret>' -docstring 'Git mode'
 map global git s ': gitui<ret>' -docstring 'Git tui'
 map global git A ': git add %val{buffile}<ret>' -docstring 'Add file'
 map global git m ': git-line-blame<ret>' -docstring 'Blame selection lines'
+map global git M ': git-file-blame<ret>' -docstring 'Blame buffer file'
 
 map global git d ': enter-user-mode git-d<ret>' -docstring 'Diff mode'
 map global git-d d ': git-open-diff<ret>' -docstring 'Open staged files'
@@ -40,6 +41,10 @@ define-command git-toggle-diff %{
 define-command git-line-blame %{
   terminal-singleton git-blame sh -c \
     "git -p log -u -L '%sh{echo ""$kak_selection_desc"" | sed -E 's/\.[0-9]+//g'}:%val{buffile}' --color=always | delta"
+}
+
+define-command git-file-blame %{
+  terminal-singleton git-blame gitu blame %val{buffile}
 }
 
 define-command git-open-diff -params 0..1 %{
