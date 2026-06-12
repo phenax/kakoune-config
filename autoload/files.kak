@@ -6,8 +6,13 @@ def file-manager -params .. %{
   terminal-singleton files env "DAFFM_PATH_RELATIVE_TO=%val{client_env_PWD}" daffm -c @kak %arg{@}
 }
 
-def findfzf %{
-  terminal-singleton fzf sh -c 'kcr edit $(fd -t f --hidden --color=never -E .git | fzf --prompt='':find '' --multi --min-height=100 --preview=''bat --color=always {}'')'
+def findfzf -params .. %{
+  terminal-singleton fzf sh -c 'kcr edit $(fd -t f --hidden --color=never -E .git | fzf --prompt='':find '' --multi --min-height=100 --preview=''bat --color=always {}'' $@)' findfzf-cmd %arg{@}
+}
+
+def findfzf-filtered -params 1 %{
+  terminal-singleton fzf sh -c \
+    'kcr edit $(fd -t f --hidden --color=never -E .git | grep -E ''''$1'''' | fzf --prompt='':find# '' --multi --min-height=100 --preview=''bat --color=always {}'')' findfzf-cmd %arg{1}
 }
 
 declare-user-mode file
@@ -15,6 +20,7 @@ map global user f ': enter-user-mode file<ret>' -docstring 'File mode'
 map global file F ': find ' -docstring 'Find files'
 map global file n ': file-manager %val{buffile}<ret>' -docstring 'File manager'
 map global file f ': findfzf<ret>' -docstring 'Fzf'
+map global file <c-f> ': findfzf -q %val{selection}<ret>' -docstring 'Fzf selection'
 
 declare-user-mode buffer
 map global user b ': enter-user-mode-with-count buffer<ret>' -docstring 'Buffer mode'

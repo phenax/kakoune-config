@@ -1,6 +1,7 @@
 set-option global grepcmd "rg -S --vimgrep --hidden -g '!**/.git/**'"
 
-map global file g ":grep ''<left>" -docstring 'Grep'
+map global file g ':grep ''''<left>' -docstring 'Grep'
+map global file * ': grep --case-sensitive %val{selection}<ret>' -docstring 'Grep selection'
 
 define-command grep-write %{
   execute-keys '%' # Consider selecting manually
