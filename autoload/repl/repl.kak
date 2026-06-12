@@ -69,8 +69,8 @@ define-command xrepl-send-command %{
     value="$kak_selection"
     if ! [ -z "$transform" ]; then
       # Available values in transform script
-      export kak_buffile kak_selection kak_selection_desc kak_cursor_line kak_cursor_column kak_config
-      value=$(echo "$kak_selection" | sh -c "$transform")
+      export kak_buffile kak_selection kak_selection_desc kak_cursor_line kak_cursor_column kak_config KAK_BUNDLE_EXEC
+      value=$(echo "$kak_selection" | sh -c "$transform" 2>&1)
     fi
     echo -e "xrepl-send-text %{$value\n}"
   }

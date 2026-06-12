@@ -2,13 +2,6 @@ define-repl-mode global s 'Shell' %{ set global xrepl_current_cmd '$SHELL' }
 define-repl-mode global n 'Node' %{ set global xrepl_current_cmd 'node' }
 define-repl-mode global a 'AI: Claude' %{ set global xrepl_current_cmd 'claude' }
 
-# TODO: doesnt work
-# define-repl-mode global C 'Custom' %{
-#   prompt -shell-completion 'Command: ' '
-#     set global xrepl_current_cmd "node"
-#   '
-# }
-
 hook global BufSetOption filetype=haskell %{
   define-repl-mode buffer h 'Haskell: cabal test' %{
     set global xrepl_current_cmd 'cabal test'
@@ -17,19 +10,15 @@ hook global BufSetOption filetype=haskell %{
 }
 
 hook global BufSetOption filetype=ruby %{
-  # TODO: Make generic
   define-repl-mode buffer c 'Rails console' %{
-    set global xrepl_current_cmd "just server-rails c"
+    set global xrepl_current_cmd '${KAK_BUNDLE_EXEC:-"bundle exec"} rails console'
   }
   define-repl-mode buffer r 'Rspec' %{
     set global xrepl_current_cmd '$SHELL'
     set global xrepl_current_transform 'cat > /dev/null
-      path="$kak_buffile"
-      if [ $kak_cursor_line -gt 5 ]; then
-        path="$path:$kak_cursor_line"
-      fi
-      KAK_BUNDLE_EXEC=${KAK_BUNDLE_EXEC:-"bundle exec"}
-      echo "$KAK_BUNDLE_EXEC rspec -fd $path"
+      path=$(realpath -s --relative-to="$PWD" "$kak_buffile")
+      if [ "$kak_cursor_line" -gt 5 ]; then path="$path:$kak_cursor_line"; fi
+      echo "eval \${KAK_BUNDLE_EXEC:-"bundle exec"} rspec -fd ''$path'' "
     '
     set global xrepl_current_clear_screen true
   }
@@ -40,7 +29,7 @@ hook global BufSetOption filetype=(?:javascript|typescript|jsx|tsx) %{
   # set global xrepl_current_cmd '(echo "::$kak_config::" | tee foob) && '
   define-repl-mode buffer c 'Cypress' %{
     set global xrepl_current_cmd '$SHELL'
-    set global xrepl_current_transform 'cat > /dev/null
+    set global xrepl_current_transform 'cat > /dev/null;
       cypress_config_files="cypress.config.json cypress.config.ts cypress.config.js"
       project=$($kak_config/scripts/utils.sh find_closest "$kak_buffile" $cypress_config_files)
       echo "npx cypress run --headless --e2e -P" "''$project''" "--spec ''$kak_buffile'';"
@@ -49,7 +38,7 @@ hook global BufSetOption filetype=(?:javascript|typescript|jsx|tsx) %{
   }
   define-repl-mode global j 'Jest' %{
     set global xrepl_current_cmd '$SHELL'
-    set global xrepl_current_transform 'cat > /dev/null
+    set global xrepl_current_transform 'cat > /dev/null;
       echo "sh -c \\"cd ''$(dirname "$kak_buffile")''; npx jest --runTestsByPath ''$kak_buffile''\\";"
     '
     set global xrepl_current_clear_screen true
