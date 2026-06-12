@@ -82,7 +82,7 @@ evaluate-commands %sh{
   ## Custom
   echo "
     face global search default,rgb:212121+b
-    face global CurWord +u
+    face global CurWord +ub
     face global ColumnLine default,rgb:101010
     face global RowLine default,rgb:101010
     face global WrapLine default,rgb:101010

@@ -6,9 +6,6 @@ nop %sh{
   ln -sf "$kak_runtime/autoload/plugins" "$kak_config/autoload/plugins" 2>/dev/null || true
 }
 
-# Disable indent trimming
-set-option global disabled_hooks .*-trim-indent
-
 # Disabled treesitter because eh
 # eval %sh{kak-tree-sitter -dksvv --init "${kak_session}" --with-highlighting --with-text-objects}
 eval %sh{kcr init kakoune}
@@ -33,25 +30,6 @@ set-option global modelinefmt \
 %val{cursor_line}/%val{buf_line_count}:%val{cursor_char_column}
 {StatusLineBufname}%sh{echo "$kak_bufname" | awk -F/ "{if (NF >= 2) {print \$(NF-1) \"/\" \$NF} else {print \$NF}}"}'
 
-# declare-option line-specs relative_markers
-# define-command -hidden update_relative_markers %{
-#   evaluate-commands %sh{
-#     indicators=14
-#     line_specs=$(seq $(($indicators + 1)) | while IFS= read n; do
-#       diff=$(echo "($n - ($indicators/2) - 1) * 5" | bc)
-#       line=$(echo "$kak_cursor_line + $diff" | bc)
-#       if [ "$line" -gt 0 ] && [ ! "$line" = "$kak_cursor_line" ]; then
-#         echo -e "$line|{gray}$diff"
-#       fi
-#     done);
-#     echo "set-option window relative_markers %val{timestamp} $(printf ' %s' $line_specs)"
-#   }
-# }
-# hook global WinCreate .* %{
-#   hook window NormalIdle .* %{ update_relative_markers }
-# }
-# add-highlighter global/ flag-lines blue relative_markers
-
 # Highlighters
 add-highlighter global/ number-lines -hlcursor -min-digits 3 -separator ' ' -relative
 add-highlighter global/ column '%val{cursor_char_column}' ColumnLine
@@ -63,68 +41,10 @@ hook global RegisterModified '/' %{
   # Highlight search
   add-highlighter -override global/search regex "%reg{/}" 0:search
 }
-add-highlighter global/ regex \b(TODO|FIXME)\b 0:default+rb
-add-highlighter global/ regex @(todo|fixme) 0:default+rb
-
-# Misc keys
-map global user '<esc>' ': set-register slash ""<ret>' -docstring 'Clear search highlighting'
-map global normal '/' '/(?i)' # Remap / to case-insensitive search
-map global user '/' '/'
-map global user s ': w<ret>' -docstring 'Save'
-map global normal <c-j> 15j -docstring '15 down'
-map global normal <c-k> 15k -docstring '15 up'
-
-map global user y "<a-|> xclip -selection clipboard<ret>" -docstring "yank the selection into the clipboard"
-
-declare-user-mode system
-map global user q ': enter-user-mode system<ret>' -docstring 'System mode'
-map global system o ':info %opt{}<left>' -docstring 'Print opt'
-map global system v ':info %val{}<left>' -docstring 'Print value'
-map global system d ': buffer *debug*<ret>' -docstring 'Switch to debug buffer'
-map global system f ':set buffer filetype ' -docstring 'Set filetype'
-map global system M ':set global makecmd ""<left>' -docstring 'Set global compile command'
-map global system m ': make<ret>' -docstring 'Compile'
-map global system p ': info %sh{ realpath -s --relative-to="$PWD" "$kak_buffile" }<ret>' -docstring 'Print relative file path'
-map global system P ': info %val{buffile}<ret>' -docstring 'Print absolute file path'
-map global system ! ':info %sh{}<left>' -docstring 'Run command'
-map global system t ': terminal %sh{ echo "$SHELL" }<ret>' -docstring 'Open new term'
-
-# Wrapping
-set-option global autowrap_column 100
-hook global WinSetOption filetype=git-commit %{
-  set window autowrap_column 72
-  autowrap-enable
-}
-add-highlighter global/ column '%opt{autowrap_column}' WrapLine
-add-highlighter global/ wrap -word -indent # Softwrap long lines
-map global normal = '|fmt -w $kak_opt_autowrap_column<ret>' -docstring 'Wrap text with fmt'
-
 
 # Preserve count for user modes (look for alternatives)
-# TODO: Reset count on modechange?
 declare-option -hidden int user_mode_count 0
 define-command enter-user-mode-with-count -params 1 %{
   set-option window user_mode_count %val{count}
   enter-user-mode %arg{1}
 }
-
-# Code mode
-declare-user-mode code
-map global user c ': enter-user-mode code<ret>' -docstring 'Code mode'
-map global code c ': comment-line<ret>' -docstring 'Comment/uncomment lines'
-map global code f ': apply-formatting<ret>' -docstring 'Apply configured formatter'
-def casecamel %{ exec '`s[-_<space>]<ret>d~<a-i>w' }
-def casesnake %{ exec '<a-:><a-;>s-|[a-z][A-Z]<ret>;a<space><esc>s[-\s]+<ret>c_<esc><a-i>w`' }
-def casekebab %{ exec '<a-:><a-;>s_|[a-z][A-Z]<ret>;a<space><esc>s[_\s]+<ret>c-<esc><a-i>w`' }
-map global code <a-minus> ': casekebab<ret>' -docstring 'kebab-casing'
-map global code <a-_> ': casesnake<ret>' -docstring 'snake_casing'
-map global code <a-c> ': casecamel<ret>' -docstring 'camelCasing'
-
-declare-user-mode ai
-map global code a ': enter-user-mode ai<ret>' -docstring 'AI'
-map global ai ! '!ai ""<left>' -docstring 'Insert output'
-map global ai | '|ai ""<left>' -docstring 'Replace output'
-
-# Editorconfig
-hook global WinCreate ^[^*]+$ %{ editorconfig-load }
-
